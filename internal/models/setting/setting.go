@@ -28,6 +28,9 @@ const (
 	TASK_MAX_TIMEOUT = "task_max_timeout"
 	TASK_MAX_RETRY   = "task_max_retry"
 
+	NODE_LOG_KEEP_DAYS = "node_log_keep_days"
+	SUB_LOG_KEEP_DAYS  = "sub_log_keep_days"
+
 	NOTIFY_OPERATION = "notify_operation"
 	NOTIFY_ID        = "notify_id"
 )

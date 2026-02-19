@@ -13,6 +13,9 @@ type Repository interface {
 
 	Sub() SubRepository
 	Share() ShareRepository
+	SubRun() SubRunRepository
+	NodeLog() NodeLogRepository
+	NodeUpdateLog() NodeUpdateLogRepository
 
 	Storage() StorageRepository
 

@@ -22,8 +22,15 @@ const (
 
 func Start() {
 	scheduler.Start()
+	startLogCleanup()
 }
 
 func Stop() {
 	scheduler.Stop()
+}
+
+func startLogCleanup() {
+	_, _ = scheduler.AddFunc("0 0 3 * * *", func() {
+		cleanupLogs()
+	})
 }

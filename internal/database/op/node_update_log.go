@@ -1,0 +1,20 @@
+package op
+
+import (
+	"context"
+	"time"
+
+	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+)
+
+func CreateNodeUpdateLog(ctx context.Context, logEntry *nodeModel.UpdateLog) error {
+	return NodeUpdateLogRepo().Create(ctx, logEntry)
+}
+
+func ListNodeUpdateLogs(ctx context.Context, subID uint16, limit int) ([]nodeModel.UpdateLog, error) {
+	return NodeUpdateLogRepo().List(ctx, subID, limit)
+}
+
+func CleanupNodeUpdateLogs(ctx context.Context, before time.Time) error {
+	return NodeUpdateLogRepo().CleanupBefore(ctx, before)
+}

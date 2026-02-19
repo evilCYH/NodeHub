@@ -19,6 +19,18 @@ func (db *DB) Sub() interfaces.SubRepository {
 	return &SubRepository{db: db}
 }
 
+func (db *DB) SubRun() interfaces.SubRunRepository {
+	return &SubRunRepository{db: db}
+}
+
+func (db *DB) NodeLog() interfaces.NodeLogRepository {
+	return &NodeLogRepository{db: db}
+}
+
+func (db *DB) NodeUpdateLog() interfaces.NodeUpdateLogRepository {
+	return &NodeUpdateLogRepository{db: db}
+}
+
 func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 	log.Debugf("Create sub")
 	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, created_at, updated_at)

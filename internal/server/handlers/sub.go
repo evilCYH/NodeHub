@@ -73,6 +73,10 @@ func init() {
 				Handle(refreshSub),
 		).
 		AddRoute(
+			router.NewRoute("/log", router.GET).
+				Handle(getSubRunLog),
+		).
+		AddRoute(
 			router.NewRoute("/batch", router.POST).
 				Handle(batchCreateSub),
 		)

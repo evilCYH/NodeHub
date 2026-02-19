@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"slices"
@@ -26,18 +27,62 @@ import (
 func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	startTime := time.Now()
 	retry := 0
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	runLog := subModel.RunLog{
+		SubID:     subID,
+		Status:    "running",
+		CreatedAt: time.Now(),
+	}
+	if err := op.CreateSubRun(ctx, &runLog); err != nil {
+		log.Warnf("failed to create sub run: %v", err)
+		runLog.ID = 0
+	}
+	addRunEvent := func(step, level, message string) {
+		if runLog.ID == 0 {
+			return
+		}
+		_ = op.CreateSubRunEvent(ctx, &subModel.RunEvent{
+			RunID:   runLog.ID,
+			SubID:   subID,
+			Step:    step,
+			Level:   level,
+			Message: message,
+		})
+	}
+	defer func() {
+		if runLog.ID == 0 {
+			return
+		}
+		if runLog.Status == "" || runLog.Status == "running" {
+			runLog.Status = "error"
+			runLog.Message = "unexpected termination"
+		}
+
+		runLog.DurationMs = uint32(time.Since(startTime).Milliseconds())
+		_ = op.UpdateSubRun(ctx, &runLog)
+	}()
 
 	var subConfig subModel.Config
 	if err := json.Unmarshal([]byte(config), &subConfig); err != nil {
+		addRunEvent("config", "error", fmt.Sprintf("invalid config: %v", err))
 		log.Warnf("fetch task %d failed: %v", subID, err)
+		runLog.Status = "error"
+		runLog.Message = err.Error()
 		return createFailureResult(err.Error(), startTime)
 	}
 
 	log.Debugf("fetch task %d started", subID)
 
+	addRunEvent("fetch", "info", "start fetch subscription")
 	client := mihomo.Default(subConfig.Proxy)
 	if client == nil {
+		addRunEvent("fetch", "error", "proxy config error")
 		log.Warnf("fetch task %d failed: proxy config error", subID)
+		runLog.Status = "error"
+		runLog.Message = "proxy config error"
 		return createFailureResult("proxy config error", startTime)
 	}
 	defer client.Release()
@@ -48,25 +93,32 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 
 		req, err := http.NewRequestWithContext(ctx, "GET", subConfig.Url, nil)
 		if err != nil {
+			addRunEvent("fetch", "error", fmt.Sprintf("create request failed: %v", err))
 			log.Warnf("fetch task %d failed: %v", subID, err)
 			continue
 		}
 
 		resp, err := client.Do(req)
 		if err != nil {
+			addRunEvent("fetch", "error", fmt.Sprintf("request failed: %v", err))
 			log.Warnf("fetch task %d failed: %v", subID, err)
 			continue
 		}
-		defer resp.Body.Close()
 
 		content, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
 		if err != nil {
+			addRunEvent("fetch", "error", fmt.Sprintf("read response failed: %v", err))
 			log.Warnf("fetch task %d failed: %v", subID, err)
 			continue
 		}
+		addRunEvent("convert", "info", "start subconv convert")
 		contentStr, err := subconv.ConvertData(string(content), "mihomo")
 		if err != nil {
+			addRunEvent("convert", "error", fmt.Sprintf("convert failed: %v", err))
 			log.Errorf("fetch task %d failed: %v", subID, err)
+			runLog.Status = "error"
+			runLog.Message = err.Error()
 			return createFailureResult(err.Error(), startTime)
 		}
 		content = []byte(contentStr)
@@ -80,6 +132,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		lines := bytes.Split(content, []byte("\n"))
 		lines = lines[1:]
 		rawCount := 0
+		addRunEvent("parse", "info", "start parse nodes")
 		for _, line := range lines {
 			if len(line) == 0 {
 				continue
@@ -125,15 +178,24 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 
 		count := len(nodes)
 
-		node.Add(subID, nodes)
+		node.Add(subID, nodes, runLog.ID)
+		addRunEvent("node_add", "info", fmt.Sprintf("raw=%d accepted=%d", rawCount, count))
 
 		log.Infof("fetch task %d completed, raw node count: %d, accepted: %d, duration: %dms",
 			subID, rawCount, count, uint16(time.Since(startTime).Milliseconds()))
 
+		runLog.Status = "success"
+		runLog.Message = "sub updated successfully"
+		runLog.RawCount = uint32(rawCount)
+		runLog.Accepted = uint32(count)
 		return createSuccessResult(uint32(rawCount), startTime, count == 0)
 	}
+	addRunEvent("fetch", "error", "fetch task failed after retries")
+	runLog.Status = "error"
+	runLog.Message = "fetch task failed"
 	return createFailureResult("fetch task failed", startTime)
 }
+
 // fixProxyConfigIfNeeded 修复订阅转换服务返回的错误代理配置格式
 // 某些订阅转换服务会将 http 代理的完整地址 (username:password@host:port) 进行 base64 编码后放入 server 字段
 // 这会导致 Mihomo 无法正确解析，本函数检测并修复这种格式
@@ -254,12 +316,12 @@ func fixProxyConfigIfNeeded(raw []byte) []byte {
 
 func createFailureResult(msg string, startTime time.Time) subModel.Result {
 	return subModel.Result{
-		Success:  0,
-		Fail:     1,
+		Success:    0,
+		Fail:       1,
 		Msg:        msg,
 		LastStatus: "error",
-		LastRun:  time.Now(),
-		Duration: uint16(time.Since(startTime).Milliseconds()),
+		LastRun:    time.Now(),
+		Duration:   uint16(time.Since(startTime).Milliseconds()),
 	}
 }
 
@@ -272,8 +334,8 @@ func createSuccessResult(count uint32, startTime time.Time, nodeNull bool) subMo
 		Success:       1,
 		Fail:          0,
 		NodeNullCount: nodeNullCount,
-		Msg:        "sub updated successfully",
-		LastStatus: "success",
+		Msg:           "sub updated successfully",
+		LastStatus:    "success",
 		RawCount:      count,
 		LastRun:       time.Now(),
 		Duration:      uint16(time.Since(startTime).Milliseconds()),

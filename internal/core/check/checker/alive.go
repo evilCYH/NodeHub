@@ -14,6 +14,7 @@ import (
 	"github.com/bestruirui/bestsub/internal/core/mihomo"
 	"github.com/bestruirui/bestsub/internal/core/node"
 	"github.com/bestruirui/bestsub/internal/core/task"
+	"github.com/bestruirui/bestsub/internal/database/op"
 	checkModel "github.com/bestruirui/bestsub/internal/models/check"
 	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
 	"github.com/bestruirui/bestsub/internal/modules/register"
@@ -38,6 +39,7 @@ func (e *Alive) Init() error {
 
 func (e *Alive) Run(ctx context.Context, log *log.Logger, subID []uint16) checkModel.Result {
 	startTime := time.Now()
+	checkID := getCheckID(ctx)
 	var nodes []nodeModel.Data
 	var aliveCount, deadCount, totalDelay int64
 	if len(subID) == 0 {
@@ -68,36 +70,68 @@ func (e *Alive) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-			task.Submit(func() {
-				defer func() {
-					<-sem
-					wg.Done()
-				}()
-				if n.Info == nil {
-					return
-				}
+		task.Submit(func() {
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
+			if n.Info == nil {
+				return
+			}
 			var raw map[string]any
 			if err := yaml.Unmarshal(n.Raw, &raw); err != nil {
 				log.Warnf("yaml.Unmarshal failed: %v", err)
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  "unknown",
+					Level:     "error",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "yaml unmarshal failed",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 				return
 			}
+			nodeName := getNodeName(raw)
 			delay, alive := e.detectWithDelay(ctx, raw)
 			if alive {
-				log.Debugf("Node %s is alive ✔", raw["name"].(string))
 				atomic.AddInt64(&aliveCount, 1)
 				n.Info.SetAliveStatus(nodeModel.Alive, true)
 				n.Info.Delay.Update(delay)
-				log.Debugf("Node %s delay: %dms", raw["name"].(string), n.Info.Delay.Average())
 				atomic.AddInt64(&totalDelay, int64(n.Info.Delay.Average()))
 				node.UpdateRegistryAlive(n.Base.SubId, n.Base.UniqueKey, true, delay, "alive_task")
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  nodeName,
+					Level:     "info",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   fmt.Sprintf("alive: %dms", delay),
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 			} else {
-				log.Debugf("Node %s is dead ✘", raw["name"].(string))
 				atomic.AddInt64(&deadCount, 1)
 				n.Info.SetAliveStatus(nodeModel.Alive, false)
-				// 失败时不更新延迟，保持上一次成功的延迟值
 				node.UpdateRegistryAlive(n.Base.SubId, n.Base.UniqueKey, false, 0, "alive_task")
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  nodeName,
+					Level:     "warn",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "dead",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 			}
-
 		})
 	}
 	wg.Wait()

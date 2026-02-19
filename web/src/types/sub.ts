@@ -48,6 +48,33 @@ export interface SubResponse {
     updated_at: string
 }
 
+export interface SubRunLog {
+    id: number
+    sub_id: number
+    status: string
+    message?: string
+    raw_count: number
+    accepted: number
+    created_at: string
+    duration_ms: number
+}
+
+export interface SubRunEvent {
+    id: number
+    run_id: number
+    sub_id: number
+    run_time?: string
+    step: string
+    level: string
+    message: string
+    created_at: string
+}
+
+export interface SubRunLogResponse {
+    runs: SubRunLog[]
+    events: SubRunEvent[]
+}
+
 export interface SubNameAndID {
     id: number
     name: string

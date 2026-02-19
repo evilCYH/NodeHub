@@ -6,6 +6,8 @@ const nodeLogKeys = {
     detail: (subId: number | null) => [...nodeLogKeys.all, { subId }] as const,
     testLogs: (subId: number | null, level?: string, keyword?: string) =>
         [...nodeLogKeys.all, 'test', { subId, level, keyword }] as const,
+    logs: (subId: number | null, source?: string, level?: string, keyword?: string, checkId?: number) =>
+        [...nodeLogKeys.all, 'logs', { subId, source, level, keyword, checkId }] as const,
 }
 
 export function useNodeUpdateLog(subId: number | null, limit = 5, enabled = true) {
@@ -56,6 +58,38 @@ interface UseNodeTestLogsPaginatedOptions {
     page: number
     pageSize?: number
     enabled?: boolean
+}
+
+interface UseNodeLogsOptions {
+    subId: number | null
+    source?: string
+    level?: 'info' | 'warn' | 'error'
+    keyword?: string
+    checkId?: number
+    page: number
+    pageSize?: number
+    enabled?: boolean
+}
+
+export function useNodeLogs(options: UseNodeLogsOptions) {
+    const { subId, source, level, keyword, checkId, page, pageSize = 50, enabled = true } = options
+
+    return useQuery({
+        queryKey: [...nodeLogKeys.logs(subId, source, level, keyword, checkId), { page, pageSize }],
+        queryFn: async () => {
+            return api.getNodeLogs({
+                subId: subId as number,
+                source,
+                level,
+                keyword,
+                checkId,
+                page,
+                pageSize,
+            })
+        },
+        enabled: subId !== null && enabled,
+        notifyOnChangeProps: ['data', 'error', 'isLoading'],
+    })
 }
 
 export function useNodeTestLogsPaginated(options: UseNodeTestLogsPaginatedOptions) {

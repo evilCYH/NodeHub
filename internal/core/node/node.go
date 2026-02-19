@@ -167,27 +167,28 @@ func classifyTestError(err error) string {
 }
 
 type addStats struct {
-	subID       uint16
-	start       time.Time
-	rawCount    uint16
-	candidate   uint32
-	duplicate   uint32
-	invalid     uint32
-	testFailed  uint32
-	accepted    uint32
-	validNodes  []nodeModel.Data
-	validMu     sync.Mutex
-	detailMu    sync.Mutex
-	details     []string
+	subID      uint16
+	runID      uint64
+	start      time.Time
+	rawCount   uint16
+	candidate  uint32
+	duplicate  uint32
+	invalid    uint32
+	testFailed uint32
+	accepted   uint32
+	validNodes []nodeModel.Data
+	validMu    sync.Mutex
+	detailMu   sync.Mutex
+	details    []string
 	// 节点级详细日志
-	nodeLogs    []nodeModel.NodeTestLog
-	logMu       sync.Mutex
-	logCounter  uint64 // 自增ID计数器
+	nodeLogs []nodeModel.NodeLog
+	logMu    sync.Mutex
 }
 
-func newAddStats(subID, rawCount uint16) *addStats {
+func newAddStats(subID, rawCount uint16, runID uint64) *addStats {
 	return &addStats{
 		subID:    subID,
+		runID:    runID,
 		start:    time.Now(),
 		rawCount: rawCount,
 	}
@@ -242,7 +243,7 @@ func (s *addStats) AddDetail(reason string) {
 }
 
 // AddNodeLog 添加节点级详细日志
-func (s *addStats) AddNodeLog(level, nodeName, message string) {
+func (s *addStats) AddNodeLog(level string, nodeKey uint64, nodeName, message string) {
 	s.logMu.Lock()
 	defer s.logMu.Unlock()
 
@@ -251,12 +252,13 @@ func (s *addStats) AddNodeLog(level, nodeName, message string) {
 		return
 	}
 
-	s.logCounter++
-	s.nodeLogs = append(s.nodeLogs, nodeModel.NodeTestLog{
-		ID:        s.logCounter,
+	s.nodeLogs = append(s.nodeLogs, nodeModel.NodeLog{
 		SubID:     s.subID,
+		NodeKey:   nodeKey,
 		NodeName:  nodeName,
 		Level:     level,
+		Source:    nodeModel.LogSourceInit,
+		RunID:     s.runID,
 		Message:   message,
 		CreatedAt: time.Now(),
 	})
@@ -282,8 +284,7 @@ func (s *addStats) Finalize() {
 		dropped = accepted - mergedU16
 	}
 
-	updateLogMu.Lock()
-	updateLogs[s.subID] = append([]nodeModel.UpdateLog{ {
+	updateLog := nodeModel.UpdateLog{
 		SubID:      s.subID,
 		CreatedAt:  time.Now(),
 		DurationMs: uint16(time.Since(s.start).Milliseconds()),
@@ -296,11 +297,10 @@ func (s *addStats) Finalize() {
 		Merged:     mergedU16,
 		Dropped:    dropped,
 		Details:    append([]string(nil), s.details...),
-	}}, updateLogs[s.subID]...)
-	if len(updateLogs[s.subID]) > 20 {
-		updateLogs[s.subID] = updateLogs[s.subID][:20]
 	}
-	updateLogMu.Unlock()
+	if err := op.CreateNodeUpdateLog(context.Background(), &updateLog); err != nil {
+		log.Warnf("failed to save node update log: %v", err)
+	}
 
 	// 保存节点级详细日志
 	if len(s.nodeLogs) > 0 {
@@ -315,7 +315,7 @@ func clampToUint16(value uint32) uint16 {
 	return uint16(value)
 }
 
-func Add(subID uint16, nodes []nodeModel.Base) int {
+func Add(subID uint16, nodes []nodeModel.Base, runID uint64) int {
 	var nodesToProcess []nodeModel.Base
 	if len(nodes) == 0 {
 		return 0
@@ -326,7 +326,7 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 	if subID == 0 {
 		return 0
 	}
-	stats := newAddStats(subID, uint16(len(nodes)))
+	stats := newAddStats(subID, uint16(len(nodes)), runID)
 	stats.ResetFailedNodes(subID)
 
 	for _, n := range nodes {
@@ -404,11 +404,11 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 			nodeName := getNodeName(raw)
 
 			// 开始测试 - info 级别
-			stats.AddNodeLog("info", nodeName, "开始节点初测")
+			stats.AddNodeLog("info", n.UniqueKey, nodeName, "开始节点初测")
 
 			client := mihomo.Proxy(raw)
 			if client == nil {
-				stats.AddNodeLog("error", nodeName, "代理解析失败：配置无效或协议不支持")
+				stats.AddNodeLog("error", n.UniqueKey, nodeName, "代理解析失败：配置无效或协议不支持")
 				stats.IncInvalid()
 				stats.AddDetail("proxy_parse_failed")
 				UpdateRegistryInitStatus(subID, n.UniqueKey, nodeModel.InitFailed, "proxy_parse_failed")
@@ -424,7 +424,7 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 			defer client.Release()
 
 			testURL := op.GetSettingStr(setting.NODE_TEST_URL)
-			stats.AddNodeLog("info", nodeName, "发送测试请求至 "+testURL)
+			stats.AddNodeLog("info", n.UniqueKey, nodeName, "发送测试请求至 "+testURL)
 
 			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(op.GetSettingInt(setting.NODE_TEST_TIMEOUT))*time.Second)
 			defer cancel()
@@ -442,7 +442,7 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 			reqCtx := httptrace.WithClientTrace(ctx, trace)
 			request, err := http.NewRequestWithContext(reqCtx, "GET", testURL, nil)
 			if err != nil {
-				stats.AddNodeLog("error", nodeName, "创建请求失败: "+err.Error())
+				stats.AddNodeLog("error", n.UniqueKey, nodeName, "创建请求失败: "+err.Error())
 				stats.IncInvalid()
 				stats.AddDetail("request_create_failed")
 				UpdateRegistryInitStatus(subID, n.UniqueKey, nodeModel.InitFailed, "request_create_failed")
@@ -470,7 +470,7 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 				} else {
 					errMsg = "请求失败: " + errMsg
 				}
-				stats.AddNodeLog(level, nodeName, errMsg)
+				stats.AddNodeLog(level, n.UniqueKey, nodeName, errMsg)
 				stats.IncFailed()
 				stats.AddDetail("test_request_failed: " + err.Error())
 				UpdateRegistryInitStatus(subID, n.UniqueKey, nodeModel.InitFailed, classifyTestError(err))
@@ -487,7 +487,7 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 
 			if response.StatusCode != 204 {
 				msg := fmt.Sprintf("状态码不符: 期望 204, 实际 %d", response.StatusCode)
-				stats.AddNodeLog("warn", nodeName, msg)
+				stats.AddNodeLog("warn", n.UniqueKey, nodeName, msg)
 				stats.IncFailed()
 				stats.AddDetail("unexpected_status: " + response.Status)
 				UpdateRegistryInitStatus(subID, n.UniqueKey, nodeModel.InitFailed, "unexpected_status_"+response.Status)
@@ -507,7 +507,7 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 			}
 
 			delay := firstByteTime.Sub(startTime).Milliseconds()
-			stats.AddNodeLog("info", nodeName, fmt.Sprintf("初测通过，延迟: %dms", delay))
+			stats.AddNodeLog("info", n.UniqueKey, nodeName, fmt.Sprintf("初测通过，延迟: %dms", delay))
 
 			var info nodeModel.Info
 			// 正确初始化 Queue，设置容量为 5
@@ -545,21 +545,17 @@ func Add(subID uint16, nodes []nodeModel.Base) int {
 }
 
 func GetUpdateLog(subID uint16, limit int) nodeModel.UpdateLogResponse {
-	updateLogMu.Lock()
-	defer updateLogMu.Unlock()
-
-	logs := updateLogs[subID]
+	logs, err := op.ListNodeUpdateLogs(context.Background(), subID, limit)
+	if err != nil {
+		log.Warnf("failed to list node update logs: %v", err)
+		return nodeModel.UpdateLogResponse{}
+	}
 	if len(logs) == 0 {
 		return nodeModel.UpdateLogResponse{}
 	}
-	if limit <= 0 || limit > len(logs) {
-		limit = len(logs)
-	}
-	result := make([]nodeModel.UpdateLog, limit)
-	copy(result, logs[:limit])
 	return nodeModel.UpdateLogResponse{
-		Latest:  &result[0],
-		History: result,
+		Latest:  &logs[0],
+		History: logs,
 	}
 }
 
@@ -798,17 +794,17 @@ func mergeNodesToPool(newNodes []nodeModel.Data) int {
 	if poolLen < poolCap {
 		remainingCap := poolCap - poolLen
 		if len(newNodes) < remainingCap {
-		pool = append(pool, newNodes...)
-		for _, node := range newNodes {
-			nodeExist.Add(node.Base.UniqueKey)
-		}
-		return len(newNodes)
+			pool = append(pool, newNodes...)
+			for _, node := range newNodes {
+				nodeExist.Add(node.Base.UniqueKey)
+			}
+			return len(newNodes)
 		} else {
-		pool = append(pool, newNodes[:remainingCap]...)
-		for _, node := range newNodes[:remainingCap] {
-			nodeExist.Add(node.Base.UniqueKey)
-		}
-		newNodes = newNodes[remainingCap:]
+			pool = append(pool, newNodes[:remainingCap]...)
+			for _, node := range newNodes[:remainingCap] {
+				nodeExist.Add(node.Base.UniqueKey)
+			}
+			newNodes = newNodes[remainingCap:]
 		}
 	}
 
@@ -819,14 +815,14 @@ func mergeNodesToPool(newNodes []nodeModel.Data) int {
 	newNodeIndex := 0
 	for i := len(pool) - 1; i >= 0 && newNodeIndex < len(newNodes); i-- {
 		if newNodes[newNodeIndex].Info.Delay.Average() < pool[i].Info.Delay.Average() {
-		log.Debugf("new node delay %dms < old delay %dms,merge", newNodes[newNodeIndex].Info.Delay.Average(), pool[i].Info.Delay.Average())
-		nodeExist.Remove(pool[i].Base.UniqueKey)
-		pool[i] = newNodes[newNodeIndex]
-		nodeExist.Add(newNodes[newNodeIndex].Base.UniqueKey)
-		newNodeIndex++
+			log.Debugf("new node delay %dms < old delay %dms,merge", newNodes[newNodeIndex].Info.Delay.Average(), pool[i].Info.Delay.Average())
+			nodeExist.Remove(pool[i].Base.UniqueKey)
+			pool[i] = newNodes[newNodeIndex]
+			nodeExist.Add(newNodes[newNodeIndex].Base.UniqueKey)
+			newNodeIndex++
 		} else {
-		log.Debugf("new node delay %dms > old delay %dms,not merge", newNodes[newNodeIndex].Info.Delay.Average(), pool[i].Info.Delay.Average())
-		return newNodeIndex
+			log.Debugf("new node delay %dms > old delay %dms,not merge", newNodes[newNodeIndex].Info.Delay.Average(), pool[i].Info.Delay.Average())
+			return newNodeIndex
 		}
 	}
 	return 0
@@ -894,11 +890,11 @@ func DeleteBySubId(subID uint16) {
 	end := len(pool) - 1
 	for i := 0; i <= end; {
 		if pool[i].Base.SubId == subID {
-		nodeExist.Remove(pool[i].Base.UniqueKey)
-		pool[i] = pool[end]
-		end--
+			nodeExist.Remove(pool[i].Base.UniqueKey)
+			pool[i] = pool[end]
+			end--
 		} else {
-		i++
+			i++
 		}
 	}
 
@@ -907,62 +903,15 @@ func DeleteBySubId(subID uint16) {
 }
 
 // saveNodeTestLogs 保存节点测试日志
-func saveNodeTestLogs(subID uint16, logs []nodeModel.NodeTestLog) {
-	nodeTestLogMu.Lock()
-	defer nodeTestLogMu.Unlock()
-
-	// 追加到现有日志
-	allLogs := append(logs, nodeTestLogStore[subID]...)
-
-	// 只保留最近 1000 条
-	if len(allLogs) > 1000 {
-		allLogs = allLogs[:1000]
-	}
-
-	nodeTestLogStore[subID] = allLogs
-}
-
-// QueryNodeLogs 查询节点测试日志
-func QueryNodeLogs(query nodeModel.NodeTestLogQuery) ([]nodeModel.NodeTestLog, int64) {
-	nodeTestLogMu.RLock()
-	defer nodeTestLogMu.RUnlock()
-
-	logs := nodeTestLogStore[query.SubID]
-
-	// 筛选和搜索
-	var filtered []nodeModel.NodeTestLog
-	for _, log := range logs {
-		// 级别筛选
-		if query.Level != "" && log.Level != query.Level {
-		continue
+func saveNodeTestLogs(subID uint16, logs []nodeModel.NodeLog) {
+	for i := range logs {
+		entry := logs[i]
+		entry.SubID = subID
+		if entry.Source == "" {
+			entry.Source = nodeModel.LogSourceInit
 		}
-
-		// 关键词搜索（节点名或日志内容）
-		if query.Keyword != "" {
-		keyword := query.Keyword
-		if !strings.Contains(log.NodeName, keyword) && !strings.Contains(log.Message, keyword) {
-			continue
+		if err := op.CreateNodeLog(context.Background(), &entry); err != nil {
+			log.Warnf("failed to save node log: %v", err)
 		}
-		}
-
-		filtered = append(filtered, log)
 	}
-
-	total := int64(len(filtered))
-
-	// 分页
-	start := (query.Page - 1) * query.PageSize
-	if start < 0 {
-		start = 0
-	}
-	if start > len(filtered) {
-		start = len(filtered)
-	}
-
-	end := start + query.PageSize
-	if end > len(filtered) {
-		end = len(filtered)
-	}
-
-	return filtered[start:end], total
 }

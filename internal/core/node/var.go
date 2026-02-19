@@ -17,12 +17,6 @@ var (
 	countryInfoMap = make(map[string]nodeModel.SimpleInfo)
 	subAggBuf      = make(map[uint16]*infoSums)
 	countryAggBuf  = make(map[string]*infoSums)
-	updateLogMu    sync.Mutex
-	updateLogs     = make(map[uint16][]nodeModel.UpdateLog)
-
-	// 节点级详细日志存储
-	nodeTestLogMu    sync.RWMutex
-	nodeTestLogStore = make(map[uint16][]nodeModel.NodeTestLog)
 
 	failedNodeMu    sync.RWMutex
 	failedNodeStore = make(map[uint16][]nodeModel.FailedNode)

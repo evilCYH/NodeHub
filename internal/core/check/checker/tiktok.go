@@ -13,6 +13,7 @@ import (
 	"github.com/bestruirui/bestsub/internal/core/mihomo"
 	"github.com/bestruirui/bestsub/internal/core/node"
 	"github.com/bestruirui/bestsub/internal/core/task"
+	"github.com/bestruirui/bestsub/internal/database/op"
 	"github.com/bestruirui/bestsub/internal/models/check"
 	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
 	"github.com/bestruirui/bestsub/internal/modules/register"
@@ -31,6 +32,7 @@ func (e *TikTok) Init() error {
 
 func (e *TikTok) Run(ctx context.Context, log *log.Logger, subID []uint16) check.Result {
 	startTime := time.Now()
+	checkID := getCheckID(ctx)
 	var nodes []nodeModel.Data
 
 	if len(subID) == 0 {
@@ -63,22 +65,35 @@ func (e *TikTok) Run(ctx context.Context, log *log.Logger, subID []uint16) check
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-			task.Submit(func() {
-				defer func() {
-					<-sem
-					wg.Done()
-				}()
-				if n.Info == nil {
-					return
-				}
+		task.Submit(func() {
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
+			if n.Info == nil {
+				return
+			}
 
 			var raw map[string]any
 			if err := yaml.Unmarshal(n.Raw, &raw); err != nil {
 				log.Warnf("yaml.Unmarshal failed: %v", err)
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  "unknown",
+					Level:     "error",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "yaml unmarshal failed",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 				return
 			}
-
-			switch e.detectTikTok(ctx, raw) {
+			nodeName := getNodeName(raw)
+			result := e.detectTikTok(ctx, raw)
+			switch result {
 			case 1:
 				n.Info.SetAliveStatus(nodeModel.TikTok, true)
 			case 2:
@@ -88,6 +103,24 @@ func (e *TikTok) Run(ctx context.Context, log *log.Logger, subID []uint16) check
 				n.Info.SetAliveStatus(nodeModel.TikTokIDC, false)
 			}
 			node.UpdateRegistryTikTok(n.Base.SubId, n.Base.UniqueKey, n.Info.AliveStatus, "tiktok_task")
+			message := "tiktok: unavailable"
+			if result == 1 {
+				message = "tiktok: available"
+			} else if result == 2 {
+				message = "tiktok: idc"
+			}
+			if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+				SubID:     n.Base.SubId,
+				NodeKey:   n.Base.UniqueKey,
+				NodeName:  nodeName,
+				Level:     "info",
+				Source:    nodeModel.LogSourceCheck,
+				CheckID:   checkID,
+				Message:   message,
+				CreatedAt: time.Now(),
+			}); err != nil {
+				log.Warnf("failed to create node log: %v", err)
+			}
 		})
 	}
 	wg.Wait()

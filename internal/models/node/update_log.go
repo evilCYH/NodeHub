@@ -3,6 +3,7 @@ package node
 import "time"
 
 type UpdateLog struct {
+	ID         uint64    `json:"id"`
 	SubID      uint16    `json:"sub_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	DurationMs uint16    `json:"duration_ms"`

@@ -9,6 +9,18 @@ var repo interfaces.Repository
 func SetRepo(repository interfaces.Repository) {
 	repo = repository
 }
+
+func SubRunRepo() interfaces.SubRunRepository {
+	return repo.SubRun()
+}
+
+func NodeLogRepo() interfaces.NodeLogRepository {
+	return repo.NodeLog()
+}
+
+func NodeUpdateLogRepo() interfaces.NodeUpdateLogRepository {
+	return repo.NodeUpdateLog()
+}
 func Close() error {
 	updateAccessCount()
 	return repo.Close()

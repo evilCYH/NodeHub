@@ -50,3 +50,21 @@ export interface NodeTestLogResponse {
     total: number
     list: NodeTestLog[]
 }
+
+export interface NodeLog {
+    id: number
+    sub_id: number
+    node_key: string
+    node_name: string
+    level: 'info' | 'warn' | 'error'
+    source: 'init' | 'check' | 'unknown'
+    run_id: number
+    check_id: number
+    message: string
+    created_at: string
+}
+
+export interface NodeLogResponse {
+    total: number
+    list: NodeLog[]
+}

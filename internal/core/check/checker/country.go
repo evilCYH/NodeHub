@@ -10,6 +10,7 @@ import (
 	"github.com/bestruirui/bestsub/internal/core/mihomo"
 	"github.com/bestruirui/bestsub/internal/core/node"
 	"github.com/bestruirui/bestsub/internal/core/task"
+	"github.com/bestruirui/bestsub/internal/database/op"
 	checkModel "github.com/bestruirui/bestsub/internal/models/check"
 	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
 	"github.com/bestruirui/bestsub/internal/modules/country"
@@ -28,6 +29,7 @@ func (e *Country) Init() error {
 
 func (e *Country) Run(ctx context.Context, log *log.Logger, subID []uint16) checkModel.Result {
 	startTime := time.Now()
+	checkID := getCheckID(ctx)
 	var nodes []nodeModel.Data
 	if len(subID) == 0 {
 		nodes = node.GetAll()
@@ -60,35 +62,72 @@ func (e *Country) Run(ctx context.Context, log *log.Logger, subID []uint16) chec
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-			task.Submit(func() {
-				defer func() {
-					<-sem
-					wg.Done()
-				}()
-				if n.Info == nil {
-					return
-				}
+		task.Submit(func() {
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
+			if n.Info == nil {
+				return
+			}
 			var raw map[string]any
 			if err := yaml.Unmarshal(n.Raw, &raw); err != nil {
 				log.Warnf("yaml.Unmarshal failed: %v", err)
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  "unknown",
+					Level:     "error",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "yaml unmarshal failed",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 				return
 			}
+			nodeName := getNodeName(raw)
 			client := mihomo.Proxy(raw)
 			if client == nil {
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  nodeName,
+					Level:     "error",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "proxy parse failed",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 				return
 			}
 			client.Timeout = time.Duration(e.Timeout) * time.Second
 			defer client.Release()
-				countryCode := country.GetCode(ctx, client.Client)
-				if countryCode != "" {
-					n.Info.Country = countryCode
-					n.Info.SetAliveStatus(nodeModel.Country, true)
-				} else {
-					n.Info.SetAliveStatus(nodeModel.Country, false)
-				}
-				node.UpdateRegistryCountry(n.Base.SubId, n.Base.UniqueKey, n.Info.Country, countryCode != "", "country_task")
-			})
-		}
+			countryCode := country.GetCode(ctx, client.Client)
+			if countryCode != "" {
+				n.Info.Country = countryCode
+				n.Info.SetAliveStatus(nodeModel.Country, true)
+			} else {
+				n.Info.SetAliveStatus(nodeModel.Country, false)
+			}
+			node.UpdateRegistryCountry(n.Base.SubId, n.Base.UniqueKey, n.Info.Country, countryCode != "", "country_task")
+			if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+				SubID:     n.Base.SubId,
+				NodeKey:   n.Base.UniqueKey,
+				NodeName:  nodeName,
+				Level:     "info",
+				Source:    nodeModel.LogSourceCheck,
+				CheckID:   checkID,
+				Message:   "country: " + n.Info.Country,
+				CreatedAt: time.Now(),
+			}); err != nil {
+				log.Warnf("failed to create node log: %v", err)
+			}
+		})
+	}
 	wg.Wait()
 	return checkModel.Result{
 		Msg:      "success",

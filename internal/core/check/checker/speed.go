@@ -14,6 +14,7 @@ import (
 	"github.com/bestruirui/bestsub/internal/core/node"
 	"github.com/bestruirui/bestsub/internal/core/system"
 	"github.com/bestruirui/bestsub/internal/core/task"
+	"github.com/bestruirui/bestsub/internal/database/op"
 	checkModel "github.com/bestruirui/bestsub/internal/models/check"
 	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
 	"github.com/bestruirui/bestsub/internal/modules/register"
@@ -47,6 +48,7 @@ func (e *Speed) Init() error {
 
 func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkModel.Result {
 	startTime := time.Now()
+	checkID := getCheckID(ctx)
 	var nodes []nodeModel.Data
 	if len(subID) == 0 {
 		nodes = node.GetAll()
@@ -77,21 +79,46 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-			task.Submit(func() {
-				defer func() {
-					<-sem
-					wg.Done()
-				}()
-				if n.Info == nil {
-					return
-				}
+		task.Submit(func() {
+			defer func() {
+				<-sem
+				wg.Done()
+			}()
+			if n.Info == nil {
+				return
+			}
 			var raw map[string]any
 			if err := yaml.Unmarshal(n.Raw, &raw); err != nil {
 				log.Warnf("yaml.Unmarshal failed: %v", err)
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  "unknown",
+					Level:     "error",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "yaml unmarshal failed",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 				return
 			}
+			nodeName := getNodeName(raw)
 			client := mihomo.Proxy(raw)
 			if client == nil {
+				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+					SubID:     n.Base.SubId,
+					NodeKey:   n.Base.UniqueKey,
+					NodeName:  nodeName,
+					Level:     "error",
+					Source:    nodeModel.LogSourceCheck,
+					CheckID:   checkID,
+					Message:   "proxy parse failed",
+					CreatedAt: time.Now(),
+				}); err != nil {
+					log.Warnf("failed to create node log: %v", err)
+				}
 				return
 			}
 			defer client.Release()
@@ -100,8 +127,19 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 				speed := e.download(ctx, client.Client)
 				if speed > 0 {
 					n.Info.SpeedDown.Update(uint32(speed))
-					log.Debugf("node %s download speed: %d", raw["name"], speed)
 					node.UpdateRegistrySpeed(n.Base.SubId, n.Base.UniqueKey, 0, uint32(speed), "speed_task")
+					if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+						SubID:     n.Base.SubId,
+						NodeKey:   n.Base.UniqueKey,
+						NodeName:  nodeName,
+						Level:     "info",
+						Source:    nodeModel.LogSourceCheck,
+						CheckID:   checkID,
+						Message:   fmt.Sprintf("download: %d KB/s", speed),
+						CreatedAt: time.Now(),
+					}); err != nil {
+						log.Warnf("failed to create node log: %v", err)
+					}
 				}
 				if speed > e.DownloadSpeed {
 					downloadCount++
@@ -112,8 +150,19 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 				speed := e.upload(ctx, client.Client)
 				if speed > 0 {
 					n.Info.SpeedUp.Update(uint32(speed))
-					log.Debugf("node %s upload speed: %d", raw["name"], speed)
 					node.UpdateRegistrySpeed(n.Base.SubId, n.Base.UniqueKey, uint32(speed), 0, "speed_task")
+					if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
+						SubID:     n.Base.SubId,
+						NodeKey:   n.Base.UniqueKey,
+						NodeName:  nodeName,
+						Level:     "info",
+						Source:    nodeModel.LogSourceCheck,
+						CheckID:   checkID,
+						Message:   fmt.Sprintf("upload: %d KB/s", speed),
+						CreatedAt: time.Now(),
+					}); err != nil {
+						log.Warnf("failed to create node log: %v", err)
+					}
 				}
 				if speed > e.UploadSpeed {
 					uploadCount++

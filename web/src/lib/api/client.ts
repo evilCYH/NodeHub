@@ -1,6 +1,6 @@
 import { API_PATH } from '../config/config'
 import { tokenManager } from './token-manager'
-import type { LoginResponse, UserInfo, ApiResponse, SubResponse, CheckResponse, CheckRequest, SubRequest, DynamicConfigItem, SubNameAndID, NotifyResponse, NotifyRequest, NotifyTemplate, NotifyChannel, NotifyChannelConfigResponse, ShareResponse, ShareRequest, Setting, ChangePasswordRequest, UpdateUserInfoRequest, UpdateResponse, UpdateComponent, SystemVersion, NodeResponse, NodeUpdateLogResponse, NodeTestLogResponse } from '@/src/types'
+import type { LoginResponse, UserInfo, ApiResponse, SubResponse, CheckResponse, CheckRequest, SubRequest, DynamicConfigItem, SubNameAndID, NotifyResponse, NotifyRequest, NotifyTemplate, NotifyChannel, NotifyChannelConfigResponse, ShareResponse, ShareRequest, Setting, ChangePasswordRequest, UpdateUserInfoRequest, UpdateResponse, UpdateComponent, SystemVersion, NodeResponse, NodeUpdateLogResponse, NodeTestLogResponse, SubRunLogResponse, NodeLogResponse } from '@/src/types'
 
 const DEFAULT_REQUEST_HEADERS: Record<string, string> = {}
 
@@ -266,6 +266,32 @@ export const api = {
     if (level) url += `&level=${encodeURIComponent(level)}`
     if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`
     const response = await apiClient.get<ApiResponse<NodeTestLogResponse>>(url)
+    return response.data
+  },
+
+  async getSubRunLogs(subId: number, limit = 10, includeEvents = false): Promise<SubRunLogResponse> {
+    const query = new URLSearchParams({ sub_id: String(subId), limit: String(limit) })
+    if (includeEvents) query.set('include_events', 'true')
+    const response = await apiClient.get<ApiResponse<SubRunLogResponse>>(`${API_PATH.sub}/log?${query.toString()}`)
+    return response.data
+  },
+
+  async getNodeLogs(params: {
+    subId: number
+    source?: string
+    level?: 'info' | 'warn' | 'error'
+    keyword?: string
+    checkId?: number
+    page?: number
+    pageSize?: number
+  }): Promise<NodeLogResponse> {
+    const { subId, source, level, keyword, checkId, page = 1, pageSize = 50 } = params
+    const query = new URLSearchParams({ sub_id: String(subId), page: String(page), page_size: String(pageSize) })
+    if (source) query.set('source', source)
+    if (level) query.set('level', level)
+    if (keyword) query.set('keyword', keyword)
+    if (checkId) query.set('check_id', String(checkId))
+    const response = await apiClient.get<ApiResponse<NodeLogResponse>>(`${API_PATH.node}/logs?${query.toString()}`)
     return response.data
   },
 

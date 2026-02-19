@@ -38,6 +38,7 @@ func CheckAdd(data *checkModel.Data) error {
 	checkFunc.Store(data.ID, cronFunc{
 		fn: func() {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Duration(taskConfig.Timeout)*time.Minute)
+			ctx = context.WithValue(ctx, "check_id", data.ID)
 			checkRunning.Store(data.ID, cancel)
 			defer func() {
 				cancel()
