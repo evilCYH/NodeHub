@@ -51,6 +51,7 @@ export function NodesPage() {
                                         setStatus(value)
                                     }
                                 }}
+                                variant="outline"
                             >
                                 <ToggleGroupItem value="alive">存活</ToggleGroupItem>
                                 <ToggleGroupItem value="dead">非存活</ToggleGroupItem>
@@ -66,6 +67,7 @@ export function NodesPage() {
                                     setStatus(value)
                                 }
                             }}
+                            variant="outline"
                         >
                             <ToggleGroupItem value="alive">存活</ToggleGroupItem>
                             <ToggleGroupItem value="dead">非存活</ToggleGroupItem>
