@@ -77,7 +77,7 @@ export function SubList({
     const handleRefresh = useCallback(async (id: number) => {
         try {
             await refreshSubMutation.mutateAsync(id)
-            toast.success('刷新成功')
+            toast.info('订阅刷新已启动，测试中请稍候...')
         } catch (error) {
             console.error('Failed to refresh subscription:', error)
             toast.error('刷新失败')
@@ -162,15 +162,20 @@ export function SubList({
                                 >
                                     <FileText className="h-4 w-4" />
                                 </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleRefresh(sub.id)}
-                                    disabled={refreshSubMutation.isPending && refreshSubMutation.variables === sub.id}
-                                    className={refreshSubMutation.isPending && refreshSubMutation.variables === sub.id ? 'opacity-50' : ''}
-                                >
-                                    <RefreshCw className={`h-4 w-4 ${refreshSubMutation.isPending && refreshSubMutation.variables === sub.id ? 'animate-spin' : ''}`} />
-                                </Button>
+                                {(() => {
+                                    const isRefreshing = sub.status === 'running'
+                                    return (
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => handleRefresh(sub.id)}
+                                            disabled={isRefreshing}
+                                            className={isRefreshing ? 'opacity-50' : ''}
+                                        >
+                                            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                        </Button>
+                                    )
+                                })()}
                                 <Button
                                     size="sm"
                                     variant="outline"

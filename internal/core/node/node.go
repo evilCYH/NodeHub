@@ -315,16 +315,16 @@ func clampToUint16(value uint32) uint16 {
 	return uint16(value)
 }
 
-func Add(subID uint16, nodes []nodeModel.Base, runID uint64) int {
+func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, int) {
 	var nodesToProcess []nodeModel.Base
 	if len(nodes) == 0 {
-		return 0
+		return nil, 0
 	}
 	if subID == 0 {
 		subID = nodes[0].SubId
 	}
 	if subID == 0 {
-		return 0
+		return nil, 0
 	}
 	stats := newAddStats(subID, uint16(len(nodes)), runID)
 	stats.ResetFailedNodes(subID)
@@ -537,11 +537,13 @@ func Add(subID uint16, nodes []nodeModel.Base, runID uint64) int {
 		})
 	}
 
+	done := make(chan struct{})
 	go func() {
 		wg.Wait()
 		stats.Finalize()
+		close(done)
 	}()
-	return len(nodesToProcess)
+	return done, len(nodesToProcess)
 }
 
 func GetUpdateLog(subID uint16, limit int) nodeModel.UpdateLogResponse {

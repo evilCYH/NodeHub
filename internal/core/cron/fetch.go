@@ -16,6 +16,7 @@ import (
 var fetchFunc = generic.MapOf[uint16, cronFunc]{}
 var fetchScheduled = generic.MapOf[uint16, cron.EntryID]{}
 var fetchRunning = generic.MapOf[uint16, context.CancelFunc]{}
+var testingRunning = generic.MapOf[uint16, context.CancelFunc]{}
 
 func FetchLoad() {
 	subData, err := op.GetSubList(context.Background())
@@ -55,6 +56,28 @@ func runFetch(subID uint16, config string) subModel.Result {
 		fetchRunning.Delete(subID)
 	}()
 	result := fetch.Do(fetchCtx, subID, config)
+
+	// 阶段2：异步等待初测完成，保持running状态
+	if done, ok := fetch.GetTestingDone(subID); ok {
+		testCtx, testCancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		testingRunning.Store(subID, testCancel)
+
+		go func() {
+			defer func() {
+				testCancel()
+				testingRunning.Delete(subID)
+				fetch.DeleteTestingDone(subID)
+			}()
+
+			select {
+			case <-done:
+				log.Infof("sub %d testing completed", subID)
+			case <-testCtx.Done():
+				log.Warnf("sub %d testing timeout or cancelled", subID)
+			}
+		}()
+	}
+
 	updateCtx, updateCancel := context.WithTimeout(context.Background(), 2*time.Second)
 	if err := op.UpdateSubResult(updateCtx, subID, result); err != nil {
 		log.Warnf("failed to update sub result: %v", err)
@@ -118,6 +141,12 @@ func FetchDisable(subID uint16) error {
 			cancel()
 			fetchRunning.Delete(subID)
 		}
+		// 停止初测
+		if testCancel, ok := testingRunning.Load(subID); ok {
+			testCancel()
+			testingRunning.Delete(subID)
+			fetch.DeleteTestingDone(subID)
+		}
 	}
 	return nil
 }
@@ -131,6 +160,12 @@ func FetchRemove(subID uint16) error {
 			cancel()
 			fetchRunning.Delete(subID)
 		}
+		// 停止初测
+		if testCancel, ok := testingRunning.Load(subID); ok {
+			testCancel()
+			testingRunning.Delete(subID)
+			fetch.DeleteTestingDone(subID)
+		}
 	}
 	return nil
 }
@@ -138,6 +173,12 @@ func FetchStop(subID uint16) error {
 	if cancel, ok := fetchRunning.Load(subID); ok {
 		cancel()
 		fetchRunning.Delete(subID)
+	}
+	// 停止初测
+	if testCancel, ok := testingRunning.Load(subID); ok {
+		testCancel()
+		testingRunning.Delete(subID)
+		fetch.DeleteTestingDone(subID)
 	}
 	return nil
 }
@@ -149,6 +190,9 @@ func FetchUpdate(data *subModel.Data) error {
 func FetchStatus(subID uint16, enable bool) string {
 	if _, ok := fetchRunning.Load(subID); ok {
 		return RunningStatus
+	}
+	if _, ok := testingRunning.Load(subID); ok {
+		return RunningStatus // 初测中也返回running
 	}
 	if !enable {
 		return DisabledStatus

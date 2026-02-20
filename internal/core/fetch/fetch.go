@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/bestruirui/bestsub/internal/core/mihomo"
@@ -23,6 +24,22 @@ import (
 	"github.com/bestruirui/bestsub/internal/utils/log"
 	"gopkg.in/yaml.v3"
 )
+
+var testingDone = make(map[uint16]<-chan struct{})
+var testingDoneMu sync.RWMutex
+
+func GetTestingDone(subID uint16) (<-chan struct{}, bool) {
+	testingDoneMu.RLock()
+	defer testingDoneMu.RUnlock()
+	done, ok := testingDone[subID]
+	return done, ok
+}
+
+func DeleteTestingDone(subID uint16) {
+	testingDoneMu.Lock()
+	defer testingDoneMu.Unlock()
+	delete(testingDone, subID)
+}
 
 func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	startTime := time.Now()
@@ -178,7 +195,10 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 
 		count := len(nodes)
 
-		node.Add(subID, nodes, runLog.ID)
+		done, _ := node.Add(subID, nodes, runLog.ID)
+		testingDoneMu.Lock()
+		testingDone[subID] = done
+		testingDoneMu.Unlock()
 		addRunEvent("node_add", "info", fmt.Sprintf("raw=%d accepted=%d", rawCount, count))
 
 		log.Infof("fetch task %d completed, raw node count: %d, accepted: %d, duration: %dms",
