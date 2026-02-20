@@ -44,6 +44,7 @@ func DeleteTestingDone(subID uint16) {
 func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	startTime := time.Now()
 	retry := 0
+	var lastErr error
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -106,27 +107,38 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	for retry < 3 {
 		time.Sleep(time.Duration(retry) * time.Second)
 		retry++
-		client.Timeout = time.Duration(subConfig.Timeout) * time.Second
+		timeoutSec := subConfig.Timeout
+		if timeoutSec <= 0 {
+			timeoutSec = 10
+		}
+		client.Timeout = time.Duration(timeoutSec) * time.Second
 
-		req, err := http.NewRequestWithContext(ctx, "GET", subConfig.Url, nil)
+		attemptCtx, attemptCancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
+		req, err := http.NewRequestWithContext(attemptCtx, "GET", subConfig.Url, nil)
 		if err != nil {
+			attemptCancel()
 			addRunEvent("fetch", "error", fmt.Sprintf("create request failed: %v", err))
 			log.Warnf("fetch task %d failed: %v", subID, err)
+			lastErr = err
 			continue
 		}
 
 		resp, err := client.Do(req)
 		if err != nil {
+			attemptCancel()
 			addRunEvent("fetch", "error", fmt.Sprintf("request failed: %v", err))
 			log.Warnf("fetch task %d failed: %v", subID, err)
+			lastErr = err
 			continue
 		}
 
 		content, err := io.ReadAll(resp.Body)
 		resp.Body.Close()
+		attemptCancel()
 		if err != nil {
 			addRunEvent("fetch", "error", fmt.Sprintf("read response failed: %v", err))
 			log.Warnf("fetch task %d failed: %v", subID, err)
+			lastErr = err
 			continue
 		}
 		addRunEvent("convert", "info", "start subconv convert")
@@ -209,6 +221,11 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		runLog.RawCount = uint32(rawCount)
 		runLog.Accepted = uint32(count)
 		return createSuccessResult(uint32(rawCount), startTime, count == 0)
+	}
+	if lastErr != nil {
+		log.Errorf("fetch task %d failed after %d retries: %v", subID, retry, lastErr)
+	} else {
+		log.Errorf("fetch task %d failed after %d retries: all tries failed", subID, retry)
 	}
 	addRunEvent("fetch", "error", "fetch task failed after retries")
 	runLog.Status = "error"
