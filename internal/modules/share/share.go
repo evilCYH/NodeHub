@@ -53,7 +53,7 @@ func GenSubData(genConfigStr string) []byte {
 		result.Write(rename(node.Base.Raw, newName.Bytes()))
 		result.Write(newLine)
 	}
-	resultStr, err := subconv.ConvertData(result.String(), genConfig.Target)
+	resultStr, err := subconv.ConvertData(context.Background(), result.String(), genConfig.Target)
 	if err != nil {
 		return nil
 	}

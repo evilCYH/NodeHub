@@ -54,21 +54,28 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		Status:    "running",
 		CreatedAt: time.Now(),
 	}
-	if err := op.CreateSubRun(ctx, &runLog); err != nil {
+	runLogCtx, runLogCancel := context.WithTimeout(context.Background(), 2*time.Second)
+	if err := op.CreateSubRun(runLogCtx, &runLog); err != nil {
 		log.Warnf("failed to create sub run: %v", err)
 		runLog.ID = 0
 	}
+	runLogCancel()
 	addRunEvent := func(step, level, message string) {
 		if runLog.ID == 0 {
 			return
 		}
-		_ = op.CreateSubRunEvent(ctx, &subModel.RunEvent{
+		eventCtx, eventCancel := context.WithTimeout(context.Background(), 2*time.Second)
+		err := op.CreateSubRunEvent(eventCtx, &subModel.RunEvent{
 			RunID:   runLog.ID,
 			SubID:   subID,
 			Step:    step,
 			Level:   level,
 			Message: message,
 		})
+		eventCancel()
+		if err != nil {
+			log.Warnf("failed to create sub run event: %v", err)
+		}
 	}
 	defer func() {
 		if runLog.ID == 0 {
@@ -80,7 +87,11 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		}
 
 		runLog.DurationMs = uint32(time.Since(startTime).Milliseconds())
-		_ = op.UpdateSubRun(ctx, &runLog)
+		updateCtx, updateCancel := context.WithTimeout(context.Background(), 2*time.Second)
+		if err := op.UpdateSubRun(updateCtx, &runLog); err != nil {
+			log.Warnf("failed to update sub run: %v", err)
+		}
+		updateCancel()
 	}()
 
 	var subConfig subModel.Config
@@ -142,7 +153,9 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 			continue
 		}
 		addRunEvent("convert", "info", "start subconv convert")
-		contentStr, err := subconv.ConvertData(string(content), "mihomo")
+		subconvCtx, subconvCancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
+		contentStr, err := subconv.ConvertData(subconvCtx, string(content), "mihomo")
+		subconvCancel()
 		if err != nil {
 			addRunEvent("convert", "error", fmt.Sprintf("convert failed: %v", err))
 			log.Errorf("fetch task %d failed: %v", subID, err)

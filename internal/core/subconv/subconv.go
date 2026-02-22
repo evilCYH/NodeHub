@@ -18,7 +18,10 @@ import (
 
 var ErrSubconvURLNotSet = errors.New("subconv url is not set")
 
-func ConvertData(raw string, target string) (string, error) {
+func ConvertData(ctx context.Context, raw string, target string) (string, error) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	subStoreUrl := strings.TrimSpace(op.GetSettingStr(setting.SUBCONV_URL))
 	if subStoreUrl == "" {
 		log.Errorf("substore url is not set")
@@ -43,7 +46,7 @@ func ConvertData(raw string, target string) (string, error) {
 		log.Errorf("failed to marshal request body: %v", err)
 		return "", fmt.Errorf("failed to marshal request body: %w", err)
 	}
-	req, err := http.NewRequestWithContext(context.Background(), "POST", subStoreUrl+"/api/proxy/parse", bytes.NewBuffer(reqBodyBytes))
+	req, err := http.NewRequestWithContext(ctx, "POST", subStoreUrl+"/api/proxy/parse", bytes.NewBuffer(reqBodyBytes))
 	if err != nil {
 		log.Errorf("failed to create request: %v", err)
 		return "", fmt.Errorf("failed to create request: %w", err)

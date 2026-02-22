@@ -12,6 +12,12 @@ export function useSubRunLogs(subId: number | null, limit = 10, enabled = true, 
         queryKey: subLogKeys.list(subId, limit, includeEvents),
         queryFn: () => api.getSubRunLogs(subId as number, limit, includeEvents),
         enabled: subId !== null && enabled,
-        notifyOnChangeProps: ['data', 'error', 'isLoading'],
+        staleTime: 0,
+        gcTime: 0,
+        refetchInterval: (query) => {
+            const data = query.state.data as { runs?: { status: string }[] } | undefined
+            const hasRunning = data?.runs?.some(r => r.status === 'running') ?? false
+            return hasRunning ? 3000 : false
+        },
     })
 }
