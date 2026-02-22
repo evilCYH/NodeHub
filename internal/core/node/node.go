@@ -374,7 +374,7 @@ func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, i
 	log.Debugf("add %d nodes to process", len(nodesToProcess))
 	if len(nodesToProcess) == 0 {
 		stats.Finalize()
-		return 0
+		return nil, 0
 	}
 
 	var wg sync.WaitGroup
