@@ -42,7 +42,13 @@ export function SubDetail({
                                 <div className="text-muted-foreground"><span>名称:</span> {subscription.name}</div>
                                 <div className="text-muted-foreground"><span>Cron:</span> {subscription.cron_expr}</div>
                                 <div className="text-muted-foreground">
-                                    <span>状态:</span> <StatusBadge status={subscription.status === 'running' ? 'running' : (subscription.result?.last_status === 'error' || subscription.status === 'pending' ? 'error' : (subscription.enable ? subscription.status : 'none'))} />
+                                    <span>状态:</span> <StatusBadge status={subscription.status === 'running'
+                                        ? 'running'
+                                        : subscription.status === 'pending'
+                                            ? 'pending'
+                                            : (subscription.result?.last_status === 'error'
+                                                ? 'error'
+                                                : (subscription.enable ? subscription.status : 'none'))} />
                                 </div>
                                 {subscription.result?.duration && (
                                     <div className="text-muted-foreground"><span>运行耗时:</span> {formatDuration(subscription.result.duration)}</div>

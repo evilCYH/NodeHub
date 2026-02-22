@@ -124,7 +124,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		}
 		client.Timeout = time.Duration(timeoutSec) * time.Second
 
-		attemptCtx, attemptCancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
+		attemptCtx, attemptCancel := context.WithTimeout(ctx, time.Duration(timeoutSec)*time.Second)
 		req, err := http.NewRequestWithContext(attemptCtx, "GET", subConfig.Url, nil)
 		if err != nil {
 			attemptCancel()
@@ -153,7 +153,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 			continue
 		}
 		addRunEvent("convert", "info", "start subconv convert")
-		subconvCtx, subconvCancel := context.WithTimeout(context.Background(), time.Duration(timeoutSec)*time.Second)
+		subconvCtx, subconvCancel := context.WithTimeout(ctx, time.Duration(timeoutSec)*time.Second)
 		contentStr, err := subconv.ConvertData(subconvCtx, string(content), "mihomo")
 		subconvCancel()
 		if err != nil {
@@ -173,13 +173,21 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		var unique nodeModel.UniqueKey
 		lines := bytes.Split(content, []byte("\n"))
 		lines = lines[1:]
-		rawCount := 0
+		rawCount := uint32(0)
 		addRunEvent("parse", "info", "start parse nodes")
 		for _, line := range lines {
 			if len(line) == 0 {
 				continue
 			}
-			line = line[4:]
+			trimmed := bytes.TrimLeft(line, " \t")
+			if len(trimmed) == 0 || trimmed[0] != '-' {
+				continue
+			}
+			trimmed = bytes.TrimSpace(trimmed[1:])
+			if len(trimmed) == 0 {
+				continue
+			}
+			line = trimmed
 			if err := yaml.Unmarshal(line, &unique); err != nil {
 				continue
 			}
@@ -220,20 +228,22 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 
 		count := len(nodes)
 
-		done, _ := node.Add(subID, nodes, runLog.ID)
-		testingDoneMu.Lock()
-		testingDone[subID] = done
-		testingDoneMu.Unlock()
+		done, processed := node.Add(subID, nodes, runLog.ID)
+		if done != nil && processed > 0 {
+			testingDoneMu.Lock()
+			testingDone[subID] = done
+			testingDoneMu.Unlock()
+		}
 		addRunEvent("node_add", "info", fmt.Sprintf("raw=%d accepted=%d", rawCount, count))
 
 		log.Infof("fetch task %d completed, raw node count: %d, accepted: %d, duration: %dms",
-			subID, rawCount, count, uint16(time.Since(startTime).Milliseconds()))
+			subID, rawCount, count, time.Since(startTime).Milliseconds())
 
 		runLog.Status = "success"
 		runLog.Message = "sub updated successfully"
-		runLog.RawCount = uint32(rawCount)
+		runLog.RawCount = rawCount
 		runLog.Accepted = uint32(count)
-		return createSuccessResult(uint32(rawCount), startTime, count == 0)
+		return createSuccessResult(rawCount, startTime, count == 0)
 	}
 	if lastErr != nil {
 		log.Errorf("fetch task %d failed after %d retries: %v", subID, retry, lastErr)
@@ -371,12 +381,12 @@ func createFailureResult(msg string, startTime time.Time) subModel.Result {
 		Msg:        msg,
 		LastStatus: "error",
 		LastRun:    time.Now(),
-		Duration:   uint16(time.Since(startTime).Milliseconds()),
+		Duration:   uint32(time.Since(startTime).Milliseconds()),
 	}
 }
 
 func createSuccessResult(count uint32, startTime time.Time, nodeNull bool) subModel.Result {
-	nodeNullCount := uint16(0)
+	nodeNullCount := uint32(0)
 	if nodeNull {
 		nodeNullCount = 1
 	}
@@ -388,6 +398,6 @@ func createSuccessResult(count uint32, startTime time.Time, nodeNull bool) subMo
 		LastStatus:    "success",
 		RawCount:      count,
 		LastRun:       time.Now(),
-		Duration:      uint16(time.Since(startTime).Milliseconds()),
+		Duration:      uint32(time.Since(startTime).Milliseconds()),
 	}
 }

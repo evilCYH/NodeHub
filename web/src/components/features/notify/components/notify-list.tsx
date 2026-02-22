@@ -52,7 +52,7 @@ export function NotifyList({
             <CardContent>
                 <Table>
                     <TableBody>
-                        {notifies.sort((a, b) => a.id - b.id).map((notify) => (
+                        {notifies.slice().sort((a, b) => a.id - b.id).map((notify) => (
                             <TableRow key={notify.id}>
                                 <TableCell className="font-medium">{notify.name}</TableCell>
                                 <TableCell className="text-center">

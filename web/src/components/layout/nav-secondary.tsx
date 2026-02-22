@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { type Icon } from "@tabler/icons-react"
 
 import {
@@ -12,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/src/components/ui/sidebar"
+import { useRouter } from "@/src/router"
 
 export function NavSecondary({
   items,
@@ -26,14 +25,15 @@ export function NavSecondary({
   }[]
   onItemClick?: (item: { title: string; url: string; icon: Icon; onClick?: () => void }) => void
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
-  const pathname = usePathname()
+  const { currentPath, navigate } = useRouter()
 
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const isActive = pathname === item.url
+            const isExternal = item.url.startsWith('http')
+            const isActive = !isExternal && currentPath === item.url
 
             if (item.onClick) {
               return (
@@ -46,7 +46,7 @@ export function NavSecondary({
               )
             }
 
-            if (item.url.startsWith('http')) {
+            if (isExternal) {
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild isActive={isActive}>
@@ -61,11 +61,12 @@ export function NavSecondary({
 
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={isActive}>
-                  <Link href={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </Link>
+                <SidebarMenuButton
+                  isActive={isActive}
+                  onClick={() => navigate(item.url)}
+                >
+                  <item.icon />
+                  <span>{item.title}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             )

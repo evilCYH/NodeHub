@@ -2,6 +2,7 @@ export const PROXY_ENABLE = "proxy_enable"
 export const PROXY_URL = "proxy_url"
 
 export const LOG_RETENTION_DAYS = "log_retention_days"
+export const WS_ORIGIN_ALLOWLIST = "ws_origin_allowlist"
 
 export const SUBCONV_URL = "subconv_url"
 export const SUBCONV_URL_PROXY = "subconv_url_proxy"

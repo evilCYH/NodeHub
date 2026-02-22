@@ -10,10 +10,7 @@ import {
   IconBell,
   IconServer2,
 
-  IconHelp,
   IconInnerShadowTop,
-
-  IconFileText,
   IconBrandGithub,
 } from "@tabler/icons-react"
 
@@ -72,16 +69,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   ]
 
   const navSecondary = [
-    {
-      title: APP_ROUTES.LOG.title,
-      url: APP_ROUTES.LOG.path,
-      icon: IconFileText,
-    },
-    {
-      title: APP_ROUTES.HELP.title,
-      url: APP_ROUTES.HELP.path,
-      icon: IconHelp,
-    },
     {
       title: APP_ROUTES.GITHUB.title,
       url: APP_ROUTES.GITHUB.path,

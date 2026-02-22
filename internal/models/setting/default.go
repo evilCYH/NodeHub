@@ -13,7 +13,11 @@ func DefaultSetting() []Setting {
 		},
 		{
 			Key:   LOG_RETENTION_DAYS,
-			Value: "7",
+			Value: "30",
+		},
+		{
+			Key:   WS_ORIGIN_ALLOWLIST,
+			Value: "",
 		},
 		{
 			Key:   SUBCONV_URL,

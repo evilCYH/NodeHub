@@ -133,7 +133,8 @@ func UpdateSubResult(ctx context.Context, id uint16, result subModel.Result) err
 	if result.NodeNullCount != 0 {
 		result.NodeNullCount += oldStatus.NodeNullCount
 	}
-	if (result.NodeNullCount > uint16(GetSettingInt(setting.SUB_DISABLE_AUTO))) && GetSettingInt(setting.SUB_DISABLE_AUTO) != 0 {
+	subDisableThreshold := GetSettingInt(setting.SUB_DISABLE_AUTO)
+	if subDisableThreshold > 0 && result.NodeNullCount > uint32(subDisableThreshold) {
 		sub.Enable = false
 	}
 	bytes, err := json.Marshal(result)

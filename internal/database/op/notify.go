@@ -11,7 +11,7 @@ import (
 
 var nr interfaces.NotifyRepository
 var ntr interfaces.NotifyTemplateRepository
-var notifyTemplateCache = cache.New[string, string](4)
+var notifyTemplateCache = cache.New[string, notify.Template](4)
 var notifyCache = cache.New[uint16, notify.Data](4)
 
 func notifyRepo() interfaces.NotifyRepository {
@@ -116,24 +116,24 @@ func GetNotifyTemplateList() ([]notify.Template, error) {
 		notifyTemplateList = notifyTemplateCache.GetAll()
 	}
 	var result = make([]notify.Template, 0, len(notifyTemplateList))
-	for k, v := range notifyTemplateList {
-		result = append(result, notify.Template{Type: k, Template: v})
+	for _, v := range notifyTemplateList {
+		result = append(result, v)
 	}
 	return result, nil
 }
 
-func GetNotifyTemplateByType(t string) (string, error) {
+func GetNotifyTemplateByType(t string) (notify.Template, error) {
 	if value, ok := notifyTemplateCache.Get(t); ok {
 		return value, nil
 	}
 	err := refreshNotifyTemplate(context.Background())
 	if err != nil {
-		return "", err
+		return notify.Template{}, err
 	}
 	if value, ok := notifyTemplateCache.Get(t); ok {
 		return value, nil
 	}
-	return "", fmt.Errorf("notify template not found")
+	return notify.Template{}, fmt.Errorf("notify template not found")
 }
 func UpdateNotifyTemplate(ctx context.Context, nt *notify.Template) error {
 	if notifyTemplateCache.Len() == 0 {
@@ -142,7 +142,7 @@ func UpdateNotifyTemplate(ctx context.Context, nt *notify.Template) error {
 	if err := NotifyTemplateRepo().Update(ctx, nt); err != nil {
 		return err
 	}
-	notifyTemplateCache.Set(nt.Type, nt.Template)
+	notifyTemplateCache.Set(nt.Type, *nt)
 	return nil
 }
 func refreshNotifyTemplate(ctx context.Context) error {
@@ -152,7 +152,7 @@ func refreshNotifyTemplate(ctx context.Context) error {
 		return err
 	}
 	for _, t := range *notifyTemplates {
-		notifyTemplateCache.Set(t.Type, t.Template)
+		notifyTemplateCache.Set(t.Type, t)
 	}
 	return nil
 }

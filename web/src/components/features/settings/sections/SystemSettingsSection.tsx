@@ -7,6 +7,7 @@ import {
   SUBCONV_URL,
   SUBCONV_URL_PROXY,
   SUB_DISABLE_AUTO,
+  WS_ORIGIN_ALLOWLIST,
 } from "@/src/constant/settings-keys"
 import { BooleanSettingField } from "./fields/BooleanSettingField"
 import { NumberSettingField } from "./fields/NumberSettingField"
@@ -53,6 +54,19 @@ export function SystemSettingsSection({ control }: { control: Control<FormValues
             value={field.value}
             onChange={field.onChange}
             min={0}
+          />
+        )}
+      />
+
+      <Controller
+        name={WS_ORIGIN_ALLOWLIST}
+        control={control}
+        render={({ field }) => (
+          <TextSettingField
+            title="WebSocket 允许来源"
+            description="允许的 Origin 列表，逗号分隔，如: https://example.com"
+            value={String(field.value ?? "")}
+            onChange={field.onChange}
           />
         )}
       />

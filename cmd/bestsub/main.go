@@ -39,8 +39,6 @@ func main() {
 
 	node.InitNodePool(op.GetSettingInt(setting.NODE_POOL_SIZE))
 
-	log.CleanupOldLogs(5)
-
 	server.Start()
 
 	shutdown.Register(server.Close)       //   ↓↓

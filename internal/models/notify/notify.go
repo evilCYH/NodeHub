@@ -29,8 +29,9 @@ type Response struct {
 }
 
 type Template struct {
-	Type     string `db:"type" json:"type"`
-	Template string `db:"template" json:"template"`
+	Type    string `db:"type" json:"type"`
+	Title   string `db:"title" json:"title"`
+	Content string `db:"content" json:"content"`
 }
 
 type Instance interface {

@@ -61,6 +61,10 @@ func init() {
 				Handle(getSubs),
 		).
 		AddRoute(
+			router.NewRoute("/name", router.GET).
+				Handle(getSubNameAndID),
+		).
+		AddRoute(
 			router.NewRoute("/:id", router.PUT).
 				Handle(updateSub),
 		).
@@ -80,6 +84,33 @@ func init() {
 			router.NewRoute("/batch", router.POST).
 				Handle(batchCreateSub),
 		)
+}
+
+// getSubNameAndID 获取订阅名称和ID
+// @Summary 获取订阅名称和ID
+// @Tags 订阅
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} resp.ResponseStruct{data=[]sub.NameAndID} "获取成功"
+// @Failure 400 {object} resp.ResponseStruct "请求参数错误"
+// @Failure 401 {object} resp.ResponseStruct "未授权"
+// @Failure 500 {object} resp.ResponseStruct "服务器内部错误"
+// @Router /api/v1/sub/name [get]
+func getSubNameAndID(c *gin.Context) {
+	subList, err := op.GetSubList(c.Request.Context())
+	if err != nil {
+		resp.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	nameAndIDList := make([]sub.NameAndID, len(subList))
+	for i, item := range subList {
+		nameAndIDList[i] = sub.NameAndID{
+			ID:   item.ID,
+			Name: item.Name,
+		}
+	}
+	resp.Success(c, nameAndIDList)
 }
 
 // createSub 创建订阅链接

@@ -8,6 +8,7 @@ var repo interfaces.Repository
 
 func SetRepo(repository interfaces.Repository) {
 	repo = repository
+	shareRepo = repository.Share()
 }
 
 func SubRunRepo() interfaces.SubRunRepository {

@@ -120,7 +120,7 @@ export function SubList({
 
     return (
         <div className="space-y-4">
-            {subs.sort((a, b) => a.id - b.id).map((sub) => (
+            {subs.slice().sort((a, b) => a.id - b.id).map((sub) => (
                 <Card key={sub.id}>
                     <CardContent className="pl-10 pr-8 py-1">
                         <div className="grid gap-2 sm:grid-cols-[minmax(200px,320px)_10px_minmax(260px,1fr)_auto] sm:items-center sm:gap-x-2">
@@ -140,7 +140,13 @@ export function SubList({
                                     onCheckedChange={(checked) => handleToggleEnable(sub, checked)}
                                     disabled={updateSubMutation.isPending}
                                 />
-                                <StatusBadge status={sub.status === 'running' ? 'running' : (sub.result?.last_status === 'error' || sub.status === 'pending' ? 'error' : (sub.enable ? sub.status : 'none'))} />
+                                <StatusBadge status={sub.status === 'running'
+                                    ? 'running'
+                                    : sub.status === 'pending'
+                                        ? 'pending'
+                                        : (sub.result?.last_status === 'error'
+                                            ? 'error'
+                                            : (sub.enable ? sub.status : 'none'))} />
                             </div>
 
                             <div className="grid gap-1 text-xs sm:grid-cols-2 sm:gap-x-6 sm:pl-35 sm:pr-10">

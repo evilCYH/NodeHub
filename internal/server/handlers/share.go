@@ -82,16 +82,31 @@ func createShare(c *gin.Context) {
 // @Failure 500 {object} resp.ResponseStruct "服务器内部错误"
 // @Router /api/v1/share [get]
 func getShare(c *gin.Context) {
-	shares, err := op.GetShareList(c.Request.Context())
+	idStr := c.Query("id")
+	if idStr == "" {
+		shares, err := op.GetShareList(c.Request.Context())
+		if err != nil {
+			resp.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		var result = make([]shareModel.Response, 0, len(shares))
+		for _, v := range shares {
+			result = append(result, v.GenResponse())
+		}
+		resp.Success(c, result)
+		return
+	}
+	id, err := strconv.ParseUint(idStr, 10, 16)
+	if err != nil {
+		resp.ErrorBadRequest(c)
+		return
+	}
+	shareData, err := op.GetShareByID(c.Request.Context(), uint16(id))
 	if err != nil {
 		resp.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	var result = make([]shareModel.Response, 0, len(shares))
-	for _, v := range shares {
-		result = append(result, v.GenResponse())
-	}
-	resp.Success(c, result)
+	resp.Success(c, []shareModel.Response{shareData.GenResponse()})
 }
 
 // @Summary 更新分享链接

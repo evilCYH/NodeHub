@@ -11,6 +11,8 @@ const (
 
 	LOG_RETENTION_DAYS = "log_retention_days"
 
+	WS_ORIGIN_ALLOWLIST = "ws_origin_allowlist"
+
 	SUBCONV_URL       = "subconv_url"
 	SUBCONV_URL_PROXY = "subconv_url_proxy"
 

@@ -26,7 +26,7 @@ func SendSystemNotify(operation uint16, title string, content any) error {
 		return err
 	}
 
-	t, err := template.New("notify").Parse(nt)
+	t, err := template.New("notify").Parse(nt.Content)
 	if err != nil {
 		log.Errorf("failed to parse notify template: %v", err)
 		return err

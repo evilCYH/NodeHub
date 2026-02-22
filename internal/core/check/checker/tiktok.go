@@ -65,7 +65,7 @@ func (e *TikTok) Run(ctx context.Context, log *log.Logger, subID []uint16) check
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-		task.Submit(func() {
+		if err := task.Submit(func() {
 			defer func() {
 				<-sem
 				wg.Done()
@@ -121,7 +121,11 @@ func (e *TikTok) Run(ctx context.Context, log *log.Logger, subID []uint16) check
 			}); err != nil {
 				log.Warnf("failed to create node log: %v", err)
 			}
-		})
+		}); err != nil {
+			<-sem
+			wg.Done()
+			log.Warnf("tiktok check task submit failed: %v", err)
+		}
 	}
 	wg.Wait()
 

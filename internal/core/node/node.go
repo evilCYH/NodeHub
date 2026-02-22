@@ -170,7 +170,7 @@ type addStats struct {
 	subID      uint16
 	runID      uint64
 	start      time.Time
-	rawCount   uint16
+	rawCount   uint32
 	candidate  uint32
 	duplicate  uint32
 	invalid    uint32
@@ -185,7 +185,7 @@ type addStats struct {
 	logMu    sync.Mutex
 }
 
-func newAddStats(subID, rawCount uint16, runID uint64) *addStats {
+func newAddStats(subID uint16, rawCount uint32, runID uint64) *addStats {
 	return &addStats{
 		subID:    subID,
 		runID:    runID,
@@ -273,28 +273,28 @@ func (s *addStats) Finalize() {
 	}
 	log.Infof("Receipt successful, %d new nodes added", merged)
 
-	candidate := clampToUint16(atomic.LoadUint32(&s.candidate))
-	duplicate := clampToUint16(atomic.LoadUint32(&s.duplicate))
-	invalid := clampToUint16(atomic.LoadUint32(&s.invalid))
-	testFailed := clampToUint16(atomic.LoadUint32(&s.testFailed))
-	accepted := clampToUint16(atomic.LoadUint32(&s.accepted))
-	mergedU16 := clampToUint16(uint32(merged))
-	dropped := uint16(0)
-	if accepted > mergedU16 {
-		dropped = accepted - mergedU16
+	candidate := atomic.LoadUint32(&s.candidate)
+	duplicate := atomic.LoadUint32(&s.duplicate)
+	invalid := atomic.LoadUint32(&s.invalid)
+	testFailed := atomic.LoadUint32(&s.testFailed)
+	accepted := atomic.LoadUint32(&s.accepted)
+	mergedU32 := uint32(merged)
+	dropped := uint32(0)
+	if accepted > mergedU32 {
+		dropped = accepted - mergedU32
 	}
 
 	updateLog := nodeModel.UpdateLog{
 		SubID:      s.subID,
 		CreatedAt:  time.Now(),
-		DurationMs: uint16(time.Since(s.start).Milliseconds()),
+		DurationMs: uint32(time.Since(s.start).Milliseconds()),
 		RawCount:   s.rawCount,
 		Candidate:  candidate,
 		Duplicate:  duplicate,
 		Invalid:    invalid,
 		TestFailed: testFailed,
 		Accepted:   accepted,
-		Merged:     mergedU16,
+		Merged:     mergedU32,
 		Dropped:    dropped,
 		Details:    append([]string(nil), s.details...),
 	}
@@ -308,13 +308,6 @@ func (s *addStats) Finalize() {
 	}
 }
 
-func clampToUint16(value uint32) uint16 {
-	if value > uint32(^uint16(0)) {
-		return ^uint16(0)
-	}
-	return uint16(value)
-}
-
 func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, int) {
 	var nodesToProcess []nodeModel.Base
 	if len(nodes) == 0 {
@@ -326,7 +319,7 @@ func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, i
 	if subID == 0 {
 		return nil, 0
 	}
-	stats := newAddStats(subID, uint16(len(nodes)), runID)
+	stats := newAddStats(subID, uint32(len(nodes)), runID)
 	stats.ResetFailedNodes(subID)
 
 	for _, n := range nodes {
@@ -374,14 +367,16 @@ func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, i
 	log.Debugf("add %d nodes to process", len(nodesToProcess))
 	if len(nodesToProcess) == 0 {
 		stats.Finalize()
-		return nil, 0
+		done := make(chan struct{})
+		close(done)
+		return done, 0
 	}
 
 	var wg sync.WaitGroup
 	for _, node := range nodesToProcess {
 		n := node // capture loop variable
 		wg.Add(1)
-		task.Submit(func() {
+		if err := task.Submit(func() {
 			defer wg.Done()
 			defer nodeProcess.Remove(n.UniqueKey)
 			var raw map[string]any
@@ -534,7 +529,21 @@ func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, i
 			if rawName, ok := raw["name"].(string); ok {
 				log.Debugf("node: %s test end, Delay: %d", rawName, info.Delay.Average())
 			}
-		})
+		}); err != nil {
+			wg.Done()
+			nodeProcess.Remove(n.UniqueKey)
+			stats.IncFailed()
+			stats.AddDetail("task_submit_failed")
+			UpdateRegistryInitStatus(subID, n.UniqueKey, nodeModel.InitFailed, "task_submit_failed")
+			stats.AddFailedNode(nodeModel.FailedNode{
+				SubID:     subID,
+				UniqueKey: n.UniqueKey,
+				Name:      "unknown",
+				Type:      "unknown",
+				Reason:    "task_submit_failed",
+			})
+			log.Warnf("task submit failed for node %d: %v", n.UniqueKey, err)
+		}
 	}
 
 	done := make(chan struct{})

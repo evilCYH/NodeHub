@@ -10,22 +10,21 @@ import (
 )
 
 func cleanupLogs() {
-	nodeKeepDays := op.GetSettingInt(setting.NODE_LOG_KEEP_DAYS)
-	if nodeKeepDays > 0 {
-		before := time.Now().AddDate(0, 0, -nodeKeepDays)
-		if err := op.CleanupNodeLogs(context.Background(), before); err != nil {
-			log.Warnf("failed to cleanup node logs: %v", err)
-		}
-		if err := op.CleanupNodeUpdateLogs(context.Background(), before); err != nil {
-			log.Warnf("failed to cleanup node update logs: %v", err)
-		}
+	retentionDays := op.GetSettingInt(setting.LOG_RETENTION_DAYS)
+	if retentionDays <= 0 {
+		return
 	}
-
-	subKeepDays := op.GetSettingInt(setting.SUB_LOG_KEEP_DAYS)
-	if subKeepDays > 0 {
-		before := time.Now().AddDate(0, 0, -subKeepDays)
-		if err := op.CleanupSubRuns(context.Background(), before); err != nil {
-			log.Warnf("failed to cleanup sub run logs: %v", err)
-		}
+	before := time.Now().AddDate(0, 0, -retentionDays)
+	if err := op.CleanupNodeLogs(context.Background(), before); err != nil {
+		log.Warnf("failed to cleanup node logs: %v", err)
+	}
+	if err := op.CleanupNodeUpdateLogs(context.Background(), before); err != nil {
+		log.Warnf("failed to cleanup node update logs: %v", err)
+	}
+	if err := op.CleanupSubRuns(context.Background(), before); err != nil {
+		log.Warnf("failed to cleanup sub run logs: %v", err)
+	}
+	if err := log.CleanupOldLogs(retentionDays); err != nil {
+		log.Warnf("failed to cleanup file logs: %v", err)
 	}
 }

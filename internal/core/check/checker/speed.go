@@ -79,7 +79,7 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-		task.Submit(func() {
+		if err := task.Submit(func() {
 			defer func() {
 				<-sem
 				wg.Done()
@@ -168,7 +168,11 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 					uploadCount++
 				}
 			}
-		})
+		}); err != nil {
+			<-sem
+			wg.Done()
+			log.Warnf("speed check task submit failed: %v", err)
+		}
 	}
 	wg.Wait()
 	return checkModel.Result{

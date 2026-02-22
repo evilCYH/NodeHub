@@ -22,6 +22,7 @@ export interface SubResult {
     msg: string
     last_status?: 'success' | 'error'
     raw_count: number
+    node_null_count?: number
     last_run: string
     duration: number
 }

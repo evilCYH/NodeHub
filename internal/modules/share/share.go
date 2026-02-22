@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/bestruirui/bestsub/internal/core/node"
 	"github.com/bestruirui/bestsub/internal/core/subconv"
 	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/share"
 	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+	"github.com/bestruirui/bestsub/internal/models/share"
 	"github.com/bestruirui/bestsub/internal/utils"
 	"github.com/bestruirui/bestsub/internal/utils/country"
 )
@@ -53,7 +54,9 @@ func GenSubData(genConfigStr string) []byte {
 		result.Write(rename(node.Base.Raw, newName.Bytes()))
 		result.Write(newLine)
 	}
-	resultStr, err := subconv.ConvertData(context.Background(), result.String(), genConfig.Target)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	resultStr, err := subconv.ConvertData(ctx, result.String(), genConfig.Target)
+	cancel()
 	if err != nil {
 		return nil
 	}

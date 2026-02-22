@@ -27,12 +27,9 @@ export interface NotifyResponse {
  * 通知模板类型
  */
 export interface NotifyTemplate {
-    id: number
     type: string
     title: string
     content: string
-    created_at: string
-    updated_at: string
 }
 
 /**

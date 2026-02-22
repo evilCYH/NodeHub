@@ -6,15 +6,15 @@ type UpdateLog struct {
 	ID         uint64    `json:"id"`
 	SubID      uint16    `json:"sub_id"`
 	CreatedAt  time.Time `json:"created_at"`
-	DurationMs uint16    `json:"duration_ms"`
-	RawCount   uint16    `json:"raw_count"`
-	Candidate  uint16    `json:"candidate"`
-	Duplicate  uint16    `json:"duplicate"`
-	Invalid    uint16    `json:"invalid"`
-	TestFailed uint16    `json:"test_failed"`
-	Accepted   uint16    `json:"accepted"`
-	Merged     uint16    `json:"merged"`
-	Dropped    uint16    `json:"dropped"`
+	DurationMs uint32    `json:"duration_ms"`
+	RawCount   uint32    `json:"raw_count"`
+	Candidate  uint32    `json:"candidate"`
+	Duplicate  uint32    `json:"duplicate"`
+	Invalid    uint32    `json:"invalid"`
+	TestFailed uint32    `json:"test_failed"`
+	Accepted   uint32    `json:"accepted"`
+	Merged     uint32    `json:"merged"`
+	Dropped    uint32    `json:"dropped"`
 	Details    []string  `json:"details,omitempty"`
 }
 

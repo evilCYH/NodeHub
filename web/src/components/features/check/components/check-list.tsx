@@ -91,7 +91,7 @@ export function CheckList({ onEdit }: CheckListProps) {
                 <div className="overflow-x-auto" ref={containerRef}>
                     <Table ref={contentRef}>
                         <TableBody>
-                            {checks.sort((a, b) => a.id - b.id).map((check) => (
+                            {checks.slice().sort((a, b) => a.id - b.id).map((check) => (
                                 <TableRow key={check.id}>
                                     <TableCell className="space-y-1">
                                         <div className="font-medium">

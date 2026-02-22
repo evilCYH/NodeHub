@@ -70,7 +70,7 @@ func (e *Alive) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 		sem <- struct{}{}
 		wg.Add(1)
 		n := nd
-		task.Submit(func() {
+		if err := task.Submit(func() {
 			defer func() {
 				<-sem
 				wg.Done()
@@ -132,7 +132,11 @@ func (e *Alive) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 					log.Warnf("failed to create node log: %v", err)
 				}
 			}
-		})
+		}); err != nil {
+			<-sem
+			wg.Done()
+			log.Warnf("alive check task submit failed: %v", err)
+		}
 	}
 	wg.Wait()
 	avgDelay := int64(0)

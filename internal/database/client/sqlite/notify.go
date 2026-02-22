@@ -139,12 +139,13 @@ func (db *DB) NotifyTemplate() interfaces.NotifyTemplateRepository {
 
 func (r *NotifyTemplateRepository) Create(ctx context.Context, template *notify.Template) error {
 	log.Debugf("Create notify template")
-	query := `INSERT INTO notify_template (type, template)
-	          VALUES (?, ?)`
+	query := `INSERT INTO notify_template (type, title, content)
+	          VALUES (?, ?, ?)`
 
 	_, err := r.db.db.ExecContext(ctx, query,
 		template.Type,
-		template.Template,
+		template.Title,
+		template.Content,
 	)
 
 	if err != nil {
@@ -156,13 +157,14 @@ func (r *NotifyTemplateRepository) Create(ctx context.Context, template *notify.
 
 func (r *NotifyTemplateRepository) GetByType(ctx context.Context, t string) (*notify.Template, error) {
 	log.Debugf("Get notify template by type")
-	query := `SELECT type, template
+	query := `SELECT type, title, content
 	          FROM notify_template WHERE type = ?`
 
 	var template notify.Template
 	err := r.db.db.QueryRowContext(ctx, query, t).Scan(
 		&template.Type,
-		&template.Template,
+		&template.Title,
+		&template.Content,
 	)
 
 	if err != nil {
@@ -176,10 +178,11 @@ func (r *NotifyTemplateRepository) GetByType(ctx context.Context, t string) (*no
 }
 func (r *NotifyTemplateRepository) Update(ctx context.Context, template *notify.Template) error {
 	log.Debugf("Update Notify Template")
-	query := `UPDATE notify_template SET template = ? WHERE type = ?`
+	query := `UPDATE notify_template SET title = ?, content = ? WHERE type = ?`
 
 	_, err := r.db.db.ExecContext(ctx, query,
-		template.Template,
+		template.Title,
+		template.Content,
 		template.Type,
 	)
 	if err != nil {
@@ -190,7 +193,7 @@ func (r *NotifyTemplateRepository) Update(ctx context.Context, template *notify.
 
 func (r *NotifyTemplateRepository) List(ctx context.Context) (*[]notify.Template, error) {
 	log.Debugf("List notify template")
-	query := `SELECT type, template
+	query := `SELECT type, title, content
 	          FROM notify_template ORDER BY type DESC`
 
 	rows, err := r.db.db.QueryContext(ctx, query)
@@ -204,7 +207,8 @@ func (r *NotifyTemplateRepository) List(ctx context.Context) (*[]notify.Template
 		var template notify.Template
 		err := rows.Scan(
 			&template.Type,
-			&template.Template,
+			&template.Title,
+			&template.Content,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan notify template: %w", err)

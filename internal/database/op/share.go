@@ -18,6 +18,7 @@ var shareCache = cache.New[uint16, share.Data](16)
 
 var pendingUpdates = &generic.MapOf[uint16, bool]{}
 var startOnce sync.Once
+var updateMu sync.Mutex
 
 func ShareRepo() interfaces.ShareRepository {
 	if shareRepo == nil {
@@ -110,7 +111,18 @@ func UpdateShareAccessCount(ctx context.Context, id uint16) error {
 
 	pendingUpdates.Store(id, true)
 
-	startScheduleUpdateAccessCount()
+	if shareRepo != nil {
+		if err := ShareRepo().UpdateAccessCount(ctx, &[]share.UpdateAccessCountDB{
+			{ID: id, AccessCount: share.AccessCount},
+		}); err != nil {
+			log.Errorf("failed to update share access count: %v", err)
+			startScheduleUpdateAccessCount()
+		} else {
+			pendingUpdates.Delete(id)
+		}
+	} else {
+		startScheduleUpdateAccessCount()
+	}
 
 	return nil
 }
@@ -154,6 +166,9 @@ func startScheduleUpdateAccessCount() {
 var updateDataBuffer []share.UpdateAccessCountDB
 
 func updateAccessCount() {
+	updateMu.Lock()
+	defer updateMu.Unlock()
+
 	updateDataBuffer = updateDataBuffer[:0]
 
 	pendingUpdates.Range(func(id uint16, _ bool) bool {

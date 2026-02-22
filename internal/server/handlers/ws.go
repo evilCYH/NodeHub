@@ -7,6 +7,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/bestruirui/bestsub/internal/database/op"
+	"github.com/bestruirui/bestsub/internal/models/setting"
 	"github.com/bestruirui/bestsub/internal/server/middleware"
 	"github.com/bestruirui/bestsub/internal/server/resp"
 	"github.com/bestruirui/bestsub/internal/server/router"
@@ -107,9 +109,18 @@ func newWSHandler() *wsHandler {
 
 				if origin == "" {
 					log.Debugf("WebSocket客户端连接: 没有Origin头")
-					return true
+					return false
 				}
-				// TODO: 添加允许的域名列表
+				allowList := op.GetSettingStr(setting.WS_ORIGIN_ALLOWLIST)
+				if allowList == "" {
+					log.Warnf("WebSocket客户端连接: Origin=%s 被拒绝 (未配置允许列表)", origin)
+					return false
+				}
+				allowed := splitAllowList(allowList)
+				if !originAllowed(origin, allowed) {
+					log.Warnf("WebSocket客户端连接: Origin=%s 被拒绝", origin)
+					return false
+				}
 
 				log.Debugf("WebSocket客户端连接: Origin=%s", origin)
 
@@ -121,6 +132,30 @@ func newWSHandler() *wsHandler {
 	}
 	go h.broadcastLogs()
 	return h
+}
+
+func splitAllowList(value string) []string {
+	parts := strings.Split(value, ",")
+	var result []string
+	for _, part := range parts {
+		item := strings.TrimSpace(part)
+		if item != "" {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func originAllowed(origin string, allowed []string) bool {
+	if len(allowed) == 0 {
+		return false
+	}
+	for _, item := range allowed {
+		if strings.EqualFold(origin, item) {
+			return true
+		}
+	}
+	return false
 }
 
 func (h *wsHandler) handleLogWebSocket(c *gin.Context) {
