@@ -102,18 +102,18 @@ func UpdateShareAccessCount(ctx context.Context, id uint16) error {
 			return err
 		}
 	}
-	share, ok := shareCache.Get(id)
+	shareData, ok := shareCache.Get(id)
 	if !ok {
 		return fmt.Errorf("share not found")
 	}
-	share.AccessCount++
-	shareCache.Set(id, share)
+	shareData.AccessCount++
+	shareCache.Set(id, shareData)
 
 	pendingUpdates.Store(id, true)
 
 	if shareRepo != nil {
 		if err := ShareRepo().UpdateAccessCount(ctx, &[]share.UpdateAccessCountDB{
-			{ID: id, AccessCount: share.AccessCount},
+			{ID: id, AccessCount: shareData.AccessCount},
 		}); err != nil {
 			log.Errorf("failed to update share access count: %v", err)
 			startScheduleUpdateAccessCount()
