@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { Dialog, DialogContent, } from "@/src/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/src/components/ui/dialog"
 import { InlineLoading } from "@/src/components/ui/loading"
 import { useSettings, useUpdateSettings } from "@/src/lib/queries/setting-queries"
 import { SettingsLayout } from "./SettingsLayout"
@@ -159,6 +159,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="overflow-hidden p-0 md:max-h-[600px] md:max-w-[800px] lg:max-w-[900px] max-h-[90vh] h-full md:h-auto w-[95vw] sm:w-[90vw] md:w-full">
+        <DialogTitle className="sr-only">系统设置</DialogTitle>
         <SettingsLayout
           nav={nav}
           activeTab={activeTab}
