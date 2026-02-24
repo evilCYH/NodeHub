@@ -62,9 +62,9 @@ interface UseNodeTestLogsPaginatedOptions {
 
 interface UseNodeLogsOptions {
     subId: number | null
-    source?: string
-    level?: 'info' | 'warn' | 'error'
-    keyword?: string
+    source?: string | undefined
+    level?: 'info' | 'warn' | 'error' | undefined
+    keyword?: string | undefined
     checkId?: number
     page: number
     pageSize?: number
