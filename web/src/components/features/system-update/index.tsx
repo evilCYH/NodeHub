@@ -193,7 +193,7 @@ export function SystemUpdateDialog({ open, onOpenChange }: SystemUpdateDialogPro
                             <div
                               className=" [&_a]:text-blue-600 leading-relaxed [&_ul]:list-inside [&_li]:list-disc [&_li]:ml-4"
                               dangerouslySetInnerHTML={{
-                                __html: DOMPurify.sanitize(marked.parse(component.updateBody))
+                                __html: DOMPurify.sanitize(marked.parse(component.updateBody, { async: false }))
                               }}
                             />
                           </AccordionContent>
