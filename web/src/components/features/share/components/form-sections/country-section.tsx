@@ -3,15 +3,16 @@
 // Please correct any errors manually
 
 import { useState } from 'react'
-import { Controller, Control } from 'react-hook-form'
+import { Controller, Control, FieldPath } from 'react-hook-form'
 import { Label } from '@/src/components/ui/label'
 import { Badge } from '@/src/components/ui/badge'
 import { Input } from '@/src/components/ui/input'
 import { Switch } from '@/src/components/ui/switch'
+import type { ShareRequest } from '@/src/types'
 
 interface CountrySectionProps {
-    control: Control<Record<string, unknown> | any>
-    fieldName: string
+    control: Control<ShareRequest>
+    fieldName: FieldPath<ShareRequest>
 }
 
 const POPULAR_COUNTRIES = [
@@ -278,7 +279,7 @@ export function CountrySection({ control, fieldName }: CountrySectionProps) {
             control={control}
             render={({ field }) => {
                 const selectedCodes = (field.value as string[]) || []
-                const excludeFieldName = fieldName.replace('country', 'country_exclude')
+                const excludeFieldName = fieldName.replace('country', 'country_exclude') as FieldPath<ShareRequest>
                 
                 const handleAddCountry = (code: string) => {
                     if (!selectedCodes.includes(code)) {
@@ -321,7 +322,7 @@ export function CountrySection({ control, fieldName }: CountrySectionProps) {
                                     render={({ field: excludeField }) => (
                                         <Switch
                                             id={`${fieldName}-exclude`}
-                                            checked={excludeField.value || false}
+                                            checked={Boolean(excludeField.value)}
                                             onCheckedChange={excludeField.onChange}
                                         />
                                     )}

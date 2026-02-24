@@ -15,9 +15,14 @@ export function useNodes(
         status?: 'alive' | 'dead' | 'init_failed' | 'all'
     }
 ) {
+    const queryOptions = {
+        ...(subId !== null ? { subId } : {}),
+        ...options,
+    }
+
     return useQuery({
         queryKey: [...nodeKeys.listBySub(subId), options ?? {}],
-        queryFn: () => api.getNodes({ subId: subId ?? undefined, ...options }),
+        queryFn: () => api.getNodes(queryOptions),
         enabled: subId !== null,
         refetchInterval: 60 * 1000,
         notifyOnChangeProps: ['data', 'error', 'isLoading'],

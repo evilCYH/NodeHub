@@ -28,6 +28,10 @@ interface FormData {
   confirmPassword: string
 }
 
+type ErrorWithMessage = {
+  message?: string
+}
+
 export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const { user, logout, updateUser } = useAuth()
   const [activeTab, setActiveTab] = useState("profile")
@@ -53,7 +57,7 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
         confirmPassword: ""
       })
     }
-  }, [open, user])
+  }, [open, user, form])
 
   const handleUpdateUsername = useCallback(async (data: FormData) => {
     if (!data.username.trim()) {
@@ -72,8 +76,11 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       updateUser({ ...user!, username: data.username })
       toast.success("用户名修改成功")
       onOpenChange(false)
-    } catch (error: any) {
-      toast.error(error.message || "用户名修改失败")
+    } catch (error) {
+      const message = typeof error === "object" && error !== null && "message" in error
+        ? (error as ErrorWithMessage).message
+        : undefined
+      toast.error(message || "用户名修改失败")
     } finally {
       setIsSubmitting(false)
     }
@@ -108,8 +115,11 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
       setTimeout(() => {
         logout()
       }, 1000)
-    } catch (error: any) {
-      toast.error(error.message || "密码修改失败")
+    } catch (error) {
+      const message = typeof error === "object" && error !== null && "message" in error
+        ? (error as ErrorWithMessage).message
+        : undefined
+      toast.error(message || "密码修改失败")
     } finally {
       setIsSubmitting(false)
     }

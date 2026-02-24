@@ -14,6 +14,7 @@ export function createDefaultCheckData(): CheckRequest {
             log_write_file: false,
             log_level: CHECK_CONSTANTS.DEFAULT_LOG_LEVEL,
             sub_id: [],
+            sub_id_exclude: false,
         },
         config: {},
     }
@@ -61,10 +62,10 @@ export function convertCheckResponseToRequest(check: CheckResponse): CheckReques
             log_write_file: check.task?.log_write_file ?? true,
             log_level: check.task?.log_level || CHECK_CONSTANTS.DEFAULT_LOG_LEVEL,
             sub_id: check.task?.sub_id || [],
+            sub_id_exclude: check.task?.sub_id_exclude ?? false,
         },
         config: check.config || {},
     }
 }
-
 
 

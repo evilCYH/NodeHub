@@ -2,8 +2,9 @@ import { Controller, Control } from 'react-hook-form'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { safeParseInt, safeParseFloat } from '../../utils'
+import type { ShareRequest } from '@/src/types'
 
-export function FilterSection({ control }: { control: Control<Record<string, unknown> | any> }) {
+export function FilterSection({ control }: { control: Control<ShareRequest> }) {
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

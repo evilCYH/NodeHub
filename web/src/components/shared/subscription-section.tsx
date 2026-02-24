@@ -1,17 +1,21 @@
 import { useMemo } from 'react'
-import { Controller, Control } from 'react-hook-form'
+import { Controller, Control, FieldPath, FieldValues } from 'react-hook-form'
 import { Label } from '@/src/components/ui/label'
 import { Badge } from '@/src/components/ui/badge'
 import { Switch } from '@/src/components/ui/switch'
 import { useSubs } from '@/src/lib/queries/sub-queries'
 
-interface SubscriptionSectionProps {
-    control: Control<Record<string, unknown> | any>
-    subIdField: string
-    subIdExcludeField: string
+interface SubscriptionSectionProps<TFieldValues extends FieldValues = FieldValues> {
+    control: Control<TFieldValues>
+    subIdField: FieldPath<TFieldValues>
+    subIdExcludeField: FieldPath<TFieldValues>
 }
 
-export function SubscriptionSection({ control, subIdField, subIdExcludeField }: SubscriptionSectionProps) {
+export function SubscriptionSection<TFieldValues extends FieldValues = FieldValues>({
+    control,
+    subIdField,
+    subIdExcludeField,
+}: SubscriptionSectionProps<TFieldValues>) {
     const { data: subs = [], isLoading, error } = useSubs()
 
     const subList = useMemo(() =>

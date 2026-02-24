@@ -1,10 +1,11 @@
-import { Controller, Control } from 'react-hook-form'
+import { Controller, Control, FieldPath } from 'react-hook-form'
 import { Label } from '@/src/components/ui/label'
 import { Badge } from '@/src/components/ui/badge'
+import type { ShareRequest } from '@/src/types'
 
 interface AliveStatusSectionProps {
-    control: Control<Record<string, unknown> | any>
-    fieldName: string
+    control: Control<ShareRequest>
+    fieldName: FieldPath<ShareRequest>
 }
 
 // 根据 bestsub/internal/models/node/node.go 中的常量定义

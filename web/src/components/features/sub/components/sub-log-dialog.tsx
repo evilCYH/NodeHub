@@ -31,10 +31,10 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
 
     const { data: subRunData, isLoading } = useSubRunLogs(subscription?.id ?? null, 10, isOpen, true)
     const runs = subRunData?.runs ?? []
-    const events = subRunData?.events ?? []
 
     // 按 run_id 分组事件
     const eventsByRunId = useMemo(() => {
+        const events = subRunData?.events ?? []
         const map = new Map<number, SubRunEvent[]>()
         for (const event of events) {
             const list = map.get(event.run_id) ?? []
@@ -42,7 +42,7 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
             map.set(event.run_id, list)
         }
         return map
-    }, [events])
+    }, [subRunData?.events])
 
     const latest = runs[0]
 

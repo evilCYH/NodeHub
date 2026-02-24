@@ -30,4 +30,5 @@ export interface CheckTask {
     timeout: number
     type: string
     sub_id: number[]
+    sub_id_exclude: boolean
 }
