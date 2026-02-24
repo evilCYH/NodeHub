@@ -278,10 +278,10 @@ export const api = {
 
   async getNodeLogs(params: {
     subId: number
-    source?: string
-    level?: 'info' | 'warn' | 'error'
-    keyword?: string
-    checkId?: number
+    source?: string | undefined
+    level?: 'info' | 'warn' | 'error' | undefined
+    keyword?: string | undefined
+    checkId?: number | undefined
     page?: number
     pageSize?: number
   }): Promise<NodeLogResponse> {
