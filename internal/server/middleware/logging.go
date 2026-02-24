@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/gin-gonic/gin"
 )
 

@@ -8,7 +8,7 @@ interface AliveStatusSectionProps {
     fieldName: FieldPath<ShareRequest>
 }
 
-// 根据 bestsub/internal/models/node/node.go 中的常量定义
+// 根据 nodehub/internal/models/node/node.go 中的常量定义
 const ALIVE_STATUS_FLAGS = [
     { value: 1, label: '存活', name: 'Alive' },           // 1 << 0
     { value: 2, label: '国家', name: 'Country' },         // 1 << 1

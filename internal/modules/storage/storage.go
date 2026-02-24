@@ -1,10 +1,10 @@
 package storage
 
 import (
-	storageModel "github.com/bestruirui/bestsub/internal/models/storage"
-	"github.com/bestruirui/bestsub/internal/modules/register"
-	_ "github.com/bestruirui/bestsub/internal/modules/storage/channel"
-	"github.com/bestruirui/bestsub/internal/utils/desc"
+	storageModel "github.com/evilCYH/NodeHub/internal/models/storage"
+	"github.com/evilCYH/NodeHub/internal/modules/register"
+	_ "github.com/evilCYH/NodeHub/internal/modules/storage/channel"
+	"github.com/evilCYH/NodeHub/internal/utils/desc"
 )
 
 type Desc = desc.Data

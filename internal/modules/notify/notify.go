@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"html/template"
 
-	"github.com/bestruirui/bestsub/internal/database/op"
-	notifyModel "github.com/bestruirui/bestsub/internal/models/notify"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	_ "github.com/bestruirui/bestsub/internal/modules/notify/channel"
-	"github.com/bestruirui/bestsub/internal/modules/register"
-	"github.com/bestruirui/bestsub/internal/utils/desc"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	notifyModel "github.com/evilCYH/NodeHub/internal/models/notify"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	_ "github.com/evilCYH/NodeHub/internal/modules/notify/channel"
+	"github.com/evilCYH/NodeHub/internal/modules/register"
+	"github.com/evilCYH/NodeHub/internal/utils/desc"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 type Desc = desc.Data

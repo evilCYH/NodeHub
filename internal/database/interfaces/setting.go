@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
 )
 
 type SettingRepository interface {

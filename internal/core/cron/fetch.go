@@ -5,11 +5,11 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/core/fetch"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
-	"github.com/bestruirui/bestsub/internal/utils/generic"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/core/fetch"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
+	"github.com/evilCYH/NodeHub/internal/utils/generic"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/robfig/cron/v3"
 )
 

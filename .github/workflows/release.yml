@@ -23,7 +23,7 @@ jobs:
       - name: Cache toolchains
         uses: actions/cache@v4
         with:
-          path: ~/.bestsub/toolchains
+          path: ~/.nodehub/toolchains
           key: ${{ runner.os }}-toolchains-${{ hashFiles('go.mod') }}-${{ hashFiles('scripts/build.sh') }}
 
       - name: Setup Go

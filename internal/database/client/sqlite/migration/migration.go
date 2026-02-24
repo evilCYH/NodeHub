@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/bestruirui/bestsub/internal/database/migration"
+import "github.com/evilCYH/NodeHub/internal/database/migration"
 
 const ClientName = "sqlite"
 

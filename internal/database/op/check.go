@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/check"
-	"github.com/bestruirui/bestsub/internal/utils/cache"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/check"
+	"github.com/evilCYH/NodeHub/internal/utils/cache"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 var checkRepo interfaces.CheckRepository

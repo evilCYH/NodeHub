@@ -3,7 +3,7 @@ package node
 import (
 	"time"
 
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
 )
 
 func UpdateRegistryAlive(subID uint16, uniqueKey uint64, alive bool, delay uint16, source string) {

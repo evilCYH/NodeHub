@@ -3,10 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/bestruirui/bestsub/internal/core/update"
-	"github.com/bestruirui/bestsub/internal/server/middleware"
-	"github.com/bestruirui/bestsub/internal/server/resp"
-	"github.com/bestruirui/bestsub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/core/update"
+	"github.com/evilCYH/NodeHub/internal/server/middleware"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/server/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,13 +36,13 @@ func init() {
 // @Router /api/v1/update [get]
 func latest(c *gin.Context) {
 	latestInfo := make(map[string]update.LatestInfo, 1)
-	bestsub, err := update.GetLatestBestsubInfo()
+	nodehub, err := update.GetLatestNodeHubInfo()
 	if err != nil {
 		resp.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	latestInfo["bestsub"] = *bestsub
+	latestInfo["nodehub"] = *nodehub
 	resp.Success(c, latestInfo)
 }
 
@@ -60,7 +60,7 @@ func latest(c *gin.Context) {
 func updateFunc(c *gin.Context) {
 	name := c.Param("name")
 	switch name {
-	case "bestsub":
+	case "nodehub":
 		err := update.UpdateCore()
 		if err != nil {
 			resp.Error(c, http.StatusInternalServerError, err.Error())

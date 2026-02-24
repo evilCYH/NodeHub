@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/notify"
-	"github.com/bestruirui/bestsub/internal/utils/cache"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/notify"
+	"github.com/evilCYH/NodeHub/internal/utils/cache"
 )
 
 var nr interfaces.NotifyRepository

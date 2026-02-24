@@ -53,8 +53,8 @@ export function SystemUpdateDialog({ open, onOpenChange }: SystemUpdateDialogPro
   const [isLoading, setIsLoading] = useState(false)
   const [components, setComponents] = useState<ComponentStatus[]>([
     {
-      name: 'bestsub',
-      displayName: 'BestSub 后端',
+      name: 'nodehub',
+      displayName: 'NodeHub 后端',
       currentVersion: '加载中...',
       latestVersion: '加载中...',
       publishedAt: '',
@@ -78,9 +78,9 @@ export function SystemUpdateDialog({ open, onOpenChange }: SystemUpdateDialogPro
         let latestVersion = comp.latestVersion
         const latest = info[comp.name]
 
-        if (comp.name === 'bestsub') {
+        if (comp.name === 'nodehub') {
           currentVersion = systemVersion.version
-          latestVersion = info.bestsub.tag_name
+          latestVersion = info.nodehub.tag_name
         }
 
         return {

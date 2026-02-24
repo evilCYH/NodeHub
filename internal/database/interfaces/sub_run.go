@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
 )
 
 // SubRunRepository 订阅运行日志数据访问接口

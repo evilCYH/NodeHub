@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/check"
+	"github.com/evilCYH/NodeHub/internal/models/check"
 )
 
 type CheckRepository interface {

@@ -11,22 +11,23 @@ trap 'handle_error $? $LINENO' ERR
 # =============================================================================
 
 # Project configuration
-readonly APP_NAME="bestsub"
-readonly MAIN_DIR="./cmd/bestsub"
+readonly APP_NAME="nodehub"
+readonly MAIN_DIR="./cmd/nodehub"
 readonly OUTPUT_DIR="build"
-readonly TOOLCHAIN_DIR="$HOME/.bestsub/toolchains"
+readonly TOOLCHAIN_DIR="$HOME/.nodehub/toolchains"
 
 # Build metadata
 readonly BUILD_TIME="$(TZ='Asia/Shanghai' date +'%F %T %z')"
-readonly GIT_AUTHOR="bestrui"
+readonly GIT_AUTHOR="evilCYH"
 readonly GIT_VERSION="$(git describe --tags --abbrev=0 2>/dev/null || echo 'dev')"
 readonly COMMIT_ID="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
 
 # Build flags
-readonly LDFLAGS="-X 'github.com/bestruirui/bestsub/internal/utils/info.Version=${GIT_VERSION}' \
-                  -X 'github.com/bestruirui/bestsub/internal/utils/info.BuildTime=${BUILD_TIME}' \
-                  -X 'github.com/bestruirui/bestsub/internal/utils/info.Author=${GIT_AUTHOR}' \
-                  -X 'github.com/bestruirui/bestsub/internal/utils/info.Commit=${COMMIT_ID}' \
+readonly LDFLAGS="-X 'github.com/evilCYH/NodeHub/internal/utils/info.Version=${GIT_VERSION}' \
+                  -X 'github.com/evilCYH/NodeHub/internal/utils/info.BuildTime=${BUILD_TIME}' \
+                  -X 'github.com/evilCYH/NodeHub/internal/utils/info.Author=${GIT_AUTHOR}' \
+                  -X 'github.com/evilCYH/NodeHub/internal/utils/info.Commit=${COMMIT_ID}' \
+                  -X 'github.com/evilCYH/NodeHub/internal/utils/info.Repo=https://github.com/evilCYH/NodeHub' \
                   -s -w"
 
 # Android NDK configuration

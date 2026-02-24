@@ -5,7 +5,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/bestruirui/bestsub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/server/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +25,7 @@ var scalarHTML = []byte(`
 <!doctype html>
 <html>
   <head>
-    <title>BestSub API</title>
+    <title>NodeHub API</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>

@@ -3,7 +3,7 @@ package node
 import (
 	"encoding/json"
 
-	"github.com/bestruirui/bestsub/internal/utils/generic"
+	"github.com/evilCYH/NodeHub/internal/utils/generic"
 	"github.com/cespare/xxhash/v2"
 )
 

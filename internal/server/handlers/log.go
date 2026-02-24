@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bestruirui/bestsub/internal/server/middleware"
-	"github.com/bestruirui/bestsub/internal/server/resp"
-	"github.com/bestruirui/bestsub/internal/server/router"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/server/middleware"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/gin-gonic/gin"
 )
 

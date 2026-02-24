@@ -14,14 +14,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/core/mihomo"
-	"github.com/bestruirui/bestsub/internal/core/node"
-	"github.com/bestruirui/bestsub/internal/core/subconv"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/core/mihomo"
+	"github.com/evilCYH/NodeHub/internal/core/node"
+	"github.com/evilCYH/NodeHub/internal/core/subconv"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"gopkg.in/yaml.v3"
 )
 

@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/bestruirui/bestsub/internal/database/migration"
+import "github.com/evilCYH/NodeHub/internal/database/migration"
 
 // Migration002AddSubTags 为sub表添加列tags
 func Migration002AddSubTags() string {

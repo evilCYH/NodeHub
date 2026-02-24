@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/modules/country/channel"
+	"github.com/evilCYH/NodeHub/internal/modules/country/channel"
 )
 
 func GetCode(ctx context.Context, client *http.Client) string {

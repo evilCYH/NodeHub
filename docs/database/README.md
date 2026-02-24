@@ -4,7 +4,7 @@
 本文档介绍项目的数据库设计方案及相关工具使用说明。
 
 ## 设计图查看方法
-1. 下载本目录中的设计文件：[BESTSUB.json](./BESTSUB.json)
+1. 下载本目录中的设计文件：[NODEHUB.json](./NODEHUB.json)
 2. 访问 [DrawDB](https://www.drawdb.app/) 在线工具
 3. 将下载的JSON文件导入到DrawDB中
 4. 即可查看完整的数据库设计图及表结构关系

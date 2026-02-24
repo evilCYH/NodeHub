@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/bestruirui/bestsub/internal/database/migration"
+import "github.com/evilCYH/NodeHub/internal/database/migration"
 
 // Migration004AddNodeUpdateLog 添加节点聚合统计日志表
 func Migration004AddNodeUpdateLog() string {

@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/bestruirui/bestsub/internal/config"
-	"github.com/bestruirui/bestsub/internal/core/cron"
-	"github.com/bestruirui/bestsub/internal/core/node"
-	"github.com/bestruirui/bestsub/internal/core/task"
-	"github.com/bestruirui/bestsub/internal/database"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	"github.com/bestruirui/bestsub/internal/server/server"
-	"github.com/bestruirui/bestsub/internal/utils/info"
-	"github.com/bestruirui/bestsub/internal/utils/log"
-	"github.com/bestruirui/bestsub/internal/utils/shutdown"
+	"github.com/evilCYH/NodeHub/internal/config"
+	"github.com/evilCYH/NodeHub/internal/core/cron"
+	"github.com/evilCYH/NodeHub/internal/core/node"
+	"github.com/evilCYH/NodeHub/internal/core/task"
+	"github.com/evilCYH/NodeHub/internal/database"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/server/server"
+	"github.com/evilCYH/NodeHub/internal/utils/info"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/utils/shutdown"
 )
 
 func main() {

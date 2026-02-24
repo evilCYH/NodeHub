@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
-	"github.com/bestruirui/bestsub/internal/utils/cache"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
+	"github.com/evilCYH/NodeHub/internal/utils/cache"
 )
 
 var subRepo interfaces.SubRepository

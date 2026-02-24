@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/sub"
+	"github.com/evilCYH/NodeHub/internal/models/sub"
 )
 
 // SubRepository 订阅链接数据访问接口

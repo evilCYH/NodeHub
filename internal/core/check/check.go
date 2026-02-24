@@ -1,10 +1,10 @@
 package check
 
 import (
-	_ "github.com/bestruirui/bestsub/internal/core/check/checker"
-	"github.com/bestruirui/bestsub/internal/models/check"
-	"github.com/bestruirui/bestsub/internal/modules/register"
-	"github.com/bestruirui/bestsub/internal/utils/desc"
+	_ "github.com/evilCYH/NodeHub/internal/core/check/checker"
+	"github.com/evilCYH/NodeHub/internal/models/check"
+	"github.com/evilCYH/NodeHub/internal/modules/register"
+	"github.com/evilCYH/NodeHub/internal/utils/desc"
 )
 
 type Desc = desc.Data

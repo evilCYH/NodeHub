@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/auth"
+	"github.com/evilCYH/NodeHub/internal/models/auth"
 )
 
 // 单用户认证数据访问接口

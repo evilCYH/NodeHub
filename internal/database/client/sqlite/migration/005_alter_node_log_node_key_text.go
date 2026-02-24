@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/bestruirui/bestsub/internal/database/migration"
+import "github.com/evilCYH/NodeHub/internal/database/migration"
 
 // Migration005AlterNodeLogNodeKeyText 迁移 node_log.node_key 为 TEXT
 func Migration005AlterNodeLogNodeKeyText() string {

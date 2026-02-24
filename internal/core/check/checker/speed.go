@@ -10,15 +10,15 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/bestruirui/bestsub/internal/core/mihomo"
-	"github.com/bestruirui/bestsub/internal/core/node"
-	"github.com/bestruirui/bestsub/internal/core/system"
-	"github.com/bestruirui/bestsub/internal/core/task"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	checkModel "github.com/bestruirui/bestsub/internal/models/check"
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
-	"github.com/bestruirui/bestsub/internal/modules/register"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/core/mihomo"
+	"github.com/evilCYH/NodeHub/internal/core/node"
+	"github.com/evilCYH/NodeHub/internal/core/system"
+	"github.com/evilCYH/NodeHub/internal/core/task"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	checkModel "github.com/evilCYH/NodeHub/internal/models/check"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"github.com/evilCYH/NodeHub/internal/modules/register"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 const mbToBytes = 1024 * 1024

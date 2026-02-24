@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/auth"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/auth"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 // Get 获取认证信息

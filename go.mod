@@ -1,4 +1,4 @@
-module github.com/bestruirui/bestsub
+module github.com/evilCYH/NodeHub
 
 go 1.24.2
 

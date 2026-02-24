@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bestruirui/bestsub/internal/models/config"
-	"github.com/bestruirui/bestsub/internal/utils"
+	"github.com/evilCYH/NodeHub/internal/models/config"
+	"github.com/evilCYH/NodeHub/internal/utils"
 )
 
 var baseConfig = config.DefaultBase()
@@ -73,7 +73,7 @@ func setupPaths(config *config.Base, configPath string) {
 	}
 
 	if config.Database.Path == "" {
-		config.Database.Path = filepath.Join(configDir, "data", "bestsub.db")
+		config.Database.Path = filepath.Join(configDir, "data", "nodehub.db")
 	}
 
 	if config.Log.Path == "" {
@@ -102,30 +102,30 @@ func loadFromFile(config *config.Base, filePath string) error {
 }
 
 func loadFromEnv(config *config.Base) {
-	if port := os.Getenv("BESTSUB_SERVER_PORT"); port != "" {
+	if port := os.Getenv("NODEHUB_SERVER_PORT"); port != "" {
 		if p, err := parsePort(port); err == nil {
 			config.Server.Port = p
 		}
 	}
-	if host := os.Getenv("BESTSUB_SERVER_HOST"); host != "" {
+	if host := os.Getenv("NODEHUB_SERVER_HOST"); host != "" {
 		config.Server.Host = host
 	}
-	if dbPath := os.Getenv("BESTSUB_DATABASE_PATH"); dbPath != "" {
+	if dbPath := os.Getenv("NODEHUB_DATABASE_PATH"); dbPath != "" {
 		config.Database.Path = dbPath
 	}
-	if dbType := os.Getenv("BESTSUB_DATABASE_TYPE"); dbType != "" {
+	if dbType := os.Getenv("NODEHUB_DATABASE_TYPE"); dbType != "" {
 		config.Database.Type = dbType
 	}
-	if logLevel := os.Getenv("BESTSUB_LOG_LEVEL"); logLevel != "" {
+	if logLevel := os.Getenv("NODEHUB_LOG_LEVEL"); logLevel != "" {
 		config.Log.Level = logLevel
 	}
-	if logOutput := os.Getenv("BESTSUB_LOG_OUTPUT"); logOutput != "" {
+	if logOutput := os.Getenv("NODEHUB_LOG_OUTPUT"); logOutput != "" {
 		config.Log.Output = logOutput
 	}
-	if logDir := os.Getenv("BESTSUB_LOG_DIR"); logDir != "" {
+	if logDir := os.Getenv("NODEHUB_LOG_DIR"); logDir != "" {
 		config.Log.Path = logDir
 	}
-	if jwtSecret := os.Getenv("BESTSUB_JWT_SECRET"); jwtSecret != "" {
+	if jwtSecret := os.Getenv("NODEHUB_JWT_SECRET"); jwtSecret != "" {
 		config.JWT.Secret = jwtSecret
 	}
 }
@@ -258,7 +258,7 @@ func validateJWTConfig(config *config.JWTConfig) error {
 		return fmt.Errorf("JWT密钥长度不能少于16个字符，当前长度: %d", len(config.Secret))
 	}
 
-	if strings.Contains(config.Secret, "change-me") || config.Secret == "bestsub-jwt-secret" {
+	if strings.Contains(config.Secret, "change-me") || config.Secret == "nodehub-jwt-secret" {
 		return fmt.Errorf("请修改默认的JWT密钥以确保安全性")
 	}
 

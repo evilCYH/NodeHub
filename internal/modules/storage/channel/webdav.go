@@ -3,7 +3,7 @@ package channel
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/modules/register"
+	"github.com/evilCYH/NodeHub/internal/modules/register"
 )
 
 func init() {

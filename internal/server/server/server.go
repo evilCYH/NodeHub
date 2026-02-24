@@ -1,10 +1,10 @@
-// Package server 提供 BestSub 应用程序的入口点。
+// Package server 提供 NodeHub 应用程序的入口点。
 //
-// @title BestSub API
+// @title NodeHub API
 // @version 1.0.0
-// @description BestSub -  API 文档
+// @description NodeHub -  API 文档
 // @description
-// @description 这是 BestSub 的 API 文档
+// @description 这是 NodeHub 的 API 文档
 // @description
 // @description ## 认证
 // @description 大多数接口需要使用 JWT 令牌进行认证。
@@ -17,8 +17,8 @@
 // @description ## 成功响应
 // @description 所有成功响应都遵循统一格式，包含 code、message 和 data 字段。
 //
-// @contact.name BestSub API 支持
-// @contact.email support@bestsub.com
+// @contact.name NodeHub API 支持
+// @contact.email support@nodehub.com
 //
 // @license.name GPL-3.0
 // @license.url https://opensource.org/license/gpl-3-0
@@ -41,12 +41,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/config"
-	_ "github.com/bestruirui/bestsub/internal/server/handlers"
-	"github.com/bestruirui/bestsub/internal/server/middleware"
-	"github.com/bestruirui/bestsub/internal/server/router"
-	"github.com/bestruirui/bestsub/internal/utils/log"
-	"github.com/bestruirui/bestsub/static"
+	"github.com/evilCYH/NodeHub/internal/config"
+	_ "github.com/evilCYH/NodeHub/internal/server/handlers"
+	"github.com/evilCYH/NodeHub/internal/server/middleware"
+	"github.com/evilCYH/NodeHub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/static"
 	"github.com/gin-gonic/gin"
 )
 

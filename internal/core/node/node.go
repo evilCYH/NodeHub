@@ -18,14 +18,14 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/bestruirui/bestsub/internal/config"
-	"github.com/bestruirui/bestsub/internal/core/mihomo"
-	"github.com/bestruirui/bestsub/internal/core/task"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	"github.com/bestruirui/bestsub/internal/utils/generic"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/config"
+	"github.com/evilCYH/NodeHub/internal/core/mihomo"
+	"github.com/evilCYH/NodeHub/internal/core/task"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/utils/generic"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 func InitNodePool(size int) {

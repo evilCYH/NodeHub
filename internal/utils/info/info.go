@@ -5,15 +5,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/utils/color"
+	"github.com/evilCYH/NodeHub/internal/utils/color"
 )
 
 var (
 	Version   = "dev"
 	Commit    = "unknown"
 	BuildTime = "unknown"
-	Author    = "bestrui"
-	Repo      = "https://github.com/bestruirui/bestsub"
+	Author    = "evilCYH"
+	Repo      = "https://github.com/evilCYH/NodeHub"
 )
 
 func Banner() {
@@ -31,7 +31,7 @@ func Banner() {
 	fmt.Print(color.Reset)
 
 	fmt.Print(color.Blue + color.Bold)
-	fmt.Println("          🚀 BestSub - Best Sub For You")
+	fmt.Println("          🚀 NodeHub")
 	fmt.Print(color.Reset)
 
 	fmt.Print(color.Dim)

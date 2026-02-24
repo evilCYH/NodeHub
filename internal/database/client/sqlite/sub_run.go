@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
 )
 
 type SubRunRepository struct {

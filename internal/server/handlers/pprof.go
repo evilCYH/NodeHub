@@ -5,7 +5,7 @@ package handlers
 import (
 	"net/http/pprof"
 
-	"github.com/bestruirui/bestsub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/server/router"
 	"github.com/gin-gonic/gin"
 )
 

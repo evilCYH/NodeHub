@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/client/sqlite/migration"
-	migModel "github.com/bestruirui/bestsub/internal/database/migration"
+	"github.com/evilCYH/NodeHub/internal/database/client/sqlite/migration"
+	migModel "github.com/evilCYH/NodeHub/internal/database/migration"
 )
 
 func (db *DB) Migrate() error {

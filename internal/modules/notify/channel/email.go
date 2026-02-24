@@ -7,7 +7,7 @@ import (
 	"net/smtp"
 	"strings"
 
-	"github.com/bestruirui/bestsub/internal/modules/register"
+	"github.com/evilCYH/NodeHub/internal/modules/register"
 )
 
 type Email struct {

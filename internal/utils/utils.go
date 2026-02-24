@@ -45,7 +45,7 @@ func RemoveAllControlCharacters(data *[]byte) {
 	*data = cleanedData
 }
 func IsDebug() bool {
-	debug := os.Getenv("BESTSUB_DEBUG")
+	debug := os.Getenv("NODEHUB_DEBUG")
 	return strings.ToLower(debug) == "true"
 }
 

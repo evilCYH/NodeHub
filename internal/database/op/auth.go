@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/auth"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/auth"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/constant"
 )

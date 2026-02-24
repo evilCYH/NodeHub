@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bestruirui/bestsub/internal/core/mihomo"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/core/mihomo"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 var ErrSubconvURLNotSet = errors.New("subconv url is not set")

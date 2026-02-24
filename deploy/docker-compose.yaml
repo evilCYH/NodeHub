@@ -1,10 +1,10 @@
 services:
-    bestsub:
-        image: ghcr.io/bestruirui/bestsub:latest
-        container_name: bestsub
+    nodehub:
+        image: ghcr.io/evilCYH/nodehub:latest
+        container_name: nodehub
         restart: always
         ports:
             - '8080:8080'
         volumes:
-            - './bestsub:/app/data'
+            - './nodehub:/app/data'
 

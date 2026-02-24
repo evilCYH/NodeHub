@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/share"
+	"github.com/evilCYH/NodeHub/internal/models/share"
 )
 
 // 分享链接数据访问接口

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/utils"
+	"github.com/evilCYH/NodeHub/internal/utils"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

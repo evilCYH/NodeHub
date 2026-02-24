@@ -87,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 onClick={() => window.location.hash = '/dashboard'}
               >
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">BestSub</span>
+                <span className="text-base font-semibold">NodeHub</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

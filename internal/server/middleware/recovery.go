@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/bestruirui/bestsub/internal/server/resp"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/gin-gonic/gin"
 )
 

@@ -25,9 +25,9 @@ export const API_PATH = {
 }
 
 export const APP_CONFIG = {
-  name: 'BestSub',
+  name: 'NodeHub',
   version: '1.0.0',
-  author: 'BestSub',
+  author: 'evilCYH',
 }
 
 
@@ -74,6 +74,6 @@ export const APP_ROUTES = {
   },
   GITHUB: {
     title: "GitHub",
-    path: "https://github.com/bestruirui/BestSub",
+    path: "https://github.com/evilCYH/NodeHub",
   },
 }

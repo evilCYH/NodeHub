@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/models/auth"
+	"github.com/evilCYH/NodeHub/internal/models/auth"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -27,7 +27,7 @@ func GenerateToken(username, secret string) (*auth.LoginResponse, error) {
 			ExpiresAt: jwt.NewNumericDate(accessExpiresAt),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now),
-			Issuer:    "bestsub",
+			Issuer:    "nodehub",
 			Subject:   username,
 		},
 	}

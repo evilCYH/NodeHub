@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
 	_ "modernc.org/sqlite"
 )
 

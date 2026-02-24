@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/storage"
+	"github.com/evilCYH/NodeHub/internal/models/storage"
 )
 
 // 存储配置数据访问接口

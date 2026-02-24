@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bestruirui/bestsub/internal/config"
-	"github.com/bestruirui/bestsub/internal/server/auth"
-	"github.com/bestruirui/bestsub/internal/server/resp"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/config"
+	"github.com/evilCYH/NodeHub/internal/server/auth"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/gin-gonic/gin"
 )
 

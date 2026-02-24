@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/bestruirui/bestsub/internal/database/migration"
+import "github.com/evilCYH/NodeHub/internal/database/migration"
 
 // Migration005NotifyTemplateV2 扩展通知模板字段（幂等）
 func Migration005NotifyTemplateV2() string {

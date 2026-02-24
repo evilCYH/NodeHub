@@ -12,15 +12,15 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/core/mihomo"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/core/mihomo"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 const (
-	bestsubUpdateUrl    = "https://github.com/bestruirui/bestsub/releases/latest/download"
-	bestsubUpdateApiUrl = "https://api.github.com/repos/bestruirui/BestSub/releases/latest"
+	nodehubUpdateUrl    = "https://github.com/evilCYH/NodeHub/releases/latest/download"
+	nodehubUpdateApiUrl = "https://api.github.com/repos/evilCYH/NodeHub/releases/latest"
 )
 
 type LatestInfo struct {
@@ -30,8 +30,8 @@ type LatestInfo struct {
 	Message     string `json:"message"`
 }
 
-func GetLatestBestsubInfo() (*LatestInfo, error) {
-	return getLatestInfo(bestsubUpdateApiUrl, op.GetSettingBool(setting.PROXY_ENABLE))
+func GetLatestNodeHubInfo() (*LatestInfo, error) {
+	return getLatestInfo(nodehubUpdateApiUrl, op.GetSettingBool(setting.PROXY_ENABLE))
 }
 
 func getLatestInfo(url string, proxy bool) (*LatestInfo, error) {

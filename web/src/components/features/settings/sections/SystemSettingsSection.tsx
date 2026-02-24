@@ -81,12 +81,12 @@ export function SystemSettingsSection({ control }: { control: Control<FormValues
               <>
                 使用{" "}
                 <a
-                  href="https://github.com/bestruirui/SubWorker"
+                  href="https://github.com/evilCYH/NodeHub"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:underline"
                 >
-                  SubWorker
+                  NodeHub
                 </a>{" "}
                 或已有的 SubStore 地址, 示例: http://ip:port/xxxxxxx
               </>

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/bestruirui/bestsub/internal/utils/desc"
+	"github.com/evilCYH/NodeHub/internal/utils/desc"
 )
 
 type registerInfo struct {

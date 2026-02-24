@@ -12,10 +12,10 @@ export interface LatestInfo {
 }
 
 export interface UpdateResponse {
-  bestsub: LatestInfo
+  nodehub: LatestInfo
 }
 
-export type UpdateComponent = 'bestsub'
+export type UpdateComponent = 'nodehub'
 
 export interface SystemVersion {
   /** 版本号 */

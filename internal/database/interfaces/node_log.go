@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
 )
 
 // NodeLogRepository 节点日志数据访问接口

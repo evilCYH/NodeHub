@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/models/notify"
+	"github.com/evilCYH/NodeHub/internal/models/notify"
 )
 
 // NotificationChannelRepository 通知渠道数据访问接口

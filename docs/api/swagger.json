@@ -1,11 +1,11 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "BestSub -  API 文档\n\n这是 BestSub 的 API 文档\n\n## 认证\n大多数接口需要使用 JWT 令牌进行认证。\n认证时，请在 Authorization 头中包含 JWT 令牌：\n`Authorization: Bearer <your-jwt-token>`\n\n## 错误响应\n所有错误响应都遵循统一格式，包含 code、message 和 error 字段。\n\n## 成功响应\n所有成功响应都遵循统一格式，包含 code、message 和 data 字段。",
-    "title": "BestSub API",
+    "description": "NodeHub -  API 文档\n\n这是 NodeHub 的 API 文档\n\n## 认证\n大多数接口需要使用 JWT 令牌进行认证。\n认证时，请在 Authorization 头中包含 JWT 令牌：\n`Authorization: Bearer <your-jwt-token>`\n\n## 错误响应\n所有错误响应都遵循统一格式，包含 code、message 和 error 字段。\n\n## 成功响应\n所有成功响应都遵循统一格式，包含 code、message 和 data 字段。",
+    "title": "NodeHub API",
     "contact": {
-      "name": "BestSub API 支持",
-      "email": "support@bestsub.com"
+      "name": "NodeHub API 支持",
+      "email": "support@nodehub.com"
     },
     "license": {
       "name": "GPL-3.0",
@@ -34,7 +34,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_auth.LoginRequest"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_auth.LoginRequest"
             }
           }
         ],
@@ -44,13 +44,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_auth.LoginResponse"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_auth.LoginResponse"
                     }
                   }
                 }
@@ -60,19 +60,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "用户名或密码错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -100,19 +100,19 @@
           "200": {
             "description": "登出成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -142,13 +142,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_auth.Data"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_auth.Data"
                     }
                   }
                 }
@@ -158,13 +158,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -195,7 +195,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_auth.UpdateUserInfoRequest"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_auth.UpdateUserInfoRequest"
             }
           }
         ],
@@ -203,31 +203,31 @@
           "200": {
             "description": "用户名修改成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "409": {
             "description": "用户名已存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -258,7 +258,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_auth.ChangePasswordRequest"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_auth.ChangePasswordRequest"
             }
           }
         ],
@@ -266,25 +266,25 @@
           "200": {
             "description": "密码修改成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权或旧密码错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -322,7 +322,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -330,7 +330,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Response"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Response"
                       }
                     }
                   }
@@ -341,19 +341,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -382,7 +382,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Request"
             }
           }
         ],
@@ -392,13 +392,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Response"
                     }
                   }
                 }
@@ -408,19 +408,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -450,7 +450,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -460,7 +460,7 @@
                       "additionalProperties": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_core_check.Desc"
+                          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_core_check.Desc"
                         }
                       }
                     }
@@ -472,19 +472,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -522,7 +522,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Request"
             }
           }
         ],
@@ -532,13 +532,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Response"
                     }
                   }
                 }
@@ -548,25 +548,25 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "检测不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -601,31 +601,31 @@
           "200": {
             "description": "删除成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "检测不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -662,31 +662,31 @@
           "200": {
             "description": "运行成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "检测不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -723,31 +723,31 @@
           "200": {
             "description": "停止成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "检测不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -794,7 +794,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -824,25 +824,25 @@
           "400": {
             "description": "参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "文件不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -881,7 +881,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -901,13 +901,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -936,7 +936,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -944,7 +944,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Response"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Response"
                       }
                     }
                   }
@@ -955,19 +955,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1003,7 +1003,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Request"
             }
           }
         ],
@@ -1013,13 +1013,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Response"
                     }
                   }
                 }
@@ -1029,25 +1029,25 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "通知配置不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1076,7 +1076,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Request"
             }
           }
         ],
@@ -1086,13 +1086,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Response"
                     }
                   }
                 }
@@ -1102,19 +1102,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1149,31 +1149,31 @@
           "200": {
             "description": "删除成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "通知不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1202,7 +1202,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -1221,19 +1221,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1270,7 +1270,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -1280,7 +1280,7 @@
                       "additionalProperties": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_modules_notify.Desc"
+                          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_modules_notify.Desc"
                         }
                       }
                     }
@@ -1292,19 +1292,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1333,7 +1333,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -1341,7 +1341,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.NameAndID"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.NameAndID"
                       }
                     }
                   }
@@ -1352,19 +1352,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1393,7 +1393,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -1401,7 +1401,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Template"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Template"
                       }
                     }
                   }
@@ -1412,19 +1412,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1453,7 +1453,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Template"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Template"
             }
           }
         ],
@@ -1463,13 +1463,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Template"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Template"
                     }
                   }
                 }
@@ -1479,25 +1479,25 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "通知模板不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1528,7 +1528,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_notify.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_notify.Request"
             }
           }
         ],
@@ -1536,25 +1536,25 @@
           "200": {
             "description": "测试成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1592,7 +1592,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -1600,7 +1600,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_setting.Setting"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_setting.Setting"
                       }
                     }
                   }
@@ -1611,13 +1611,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1648,7 +1648,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_setting.Setting"
+                "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_setting.Setting"
               }
             }
           }
@@ -1657,25 +1657,25 @@
           "200": {
             "description": "更新成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1705,7 +1705,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -1713,7 +1713,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.Response"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.Response"
                       }
                     }
                   }
@@ -1724,13 +1724,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1759,7 +1759,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.Request"
             }
           }
         ],
@@ -1769,13 +1769,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.Response"
                     }
                   }
                 }
@@ -1785,13 +1785,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1829,7 +1829,7 @@
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1867,7 +1867,7 @@
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1905,7 +1905,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.Request"
             }
           }
         ],
@@ -1915,13 +1915,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.Response"
                     }
                   }
                 }
@@ -1931,13 +1931,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -1972,19 +1972,19 @@
           "200": {
             "description": "删除成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2014,7 +2014,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -2022,7 +2022,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_storage.Response"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_storage.Response"
                       }
                     }
                   }
@@ -2033,13 +2033,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2068,7 +2068,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_storage.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_storage.Request"
             }
           }
         ],
@@ -2078,13 +2078,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_storage.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_storage.Response"
                     }
                   }
                 }
@@ -2094,13 +2094,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2129,7 +2129,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -2148,19 +2148,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2197,7 +2197,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -2207,7 +2207,7 @@
                       "additionalProperties": {
                         "type": "array",
                         "items": {
-                          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_modules_storage.Desc"
+                          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_modules_storage.Desc"
                         }
                       }
                     }
@@ -2219,19 +2219,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2269,7 +2269,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_storage.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_storage.Request"
             }
           }
         ],
@@ -2279,13 +2279,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_storage.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_storage.Response"
                     }
                   }
                 }
@@ -2295,13 +2295,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2336,19 +2336,19 @@
           "200": {
             "description": "删除成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2386,7 +2386,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -2394,7 +2394,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Response"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Response"
                       }
                     }
                   }
@@ -2405,19 +2405,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2446,7 +2446,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Request"
             }
           }
         ],
@@ -2456,13 +2456,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Response"
                     }
                   }
                 }
@@ -2472,19 +2472,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2517,7 +2517,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Request"
+                "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Request"
               }
             }
           }
@@ -2528,7 +2528,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -2536,7 +2536,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Response"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Response"
                       }
                     }
                   }
@@ -2547,19 +2547,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2598,13 +2598,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Result"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Result"
                     }
                   }
                 }
@@ -2614,25 +2614,25 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "订阅链接不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2670,7 +2670,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Request"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Request"
             }
           }
         ],
@@ -2680,13 +2680,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Response"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Response"
                     }
                   }
                 }
@@ -2696,25 +2696,25 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "订阅链接不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2749,31 +2749,31 @@
           "200": {
             "description": "删除成功",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "404": {
             "description": "订阅链接不存在",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2798,13 +2798,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_system.HealthResponse"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_system.HealthResponse"
                     }
                   }
                 }
@@ -2814,7 +2814,7 @@
           "503": {
             "description": "服务不可用",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2844,13 +2844,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_system.Info"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_system.Info"
                     }
                   }
                 }
@@ -2860,13 +2860,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2889,7 +2889,7 @@
           "200": {
             "description": "服务存活",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2914,13 +2914,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_system.HealthResponse"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_system.HealthResponse"
                     }
                   }
                 }
@@ -2930,7 +2930,7 @@
           "503": {
             "description": "服务未就绪",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -2960,13 +2960,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_system.Version"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_system.Version"
                     }
                   }
                 }
@@ -2976,13 +2976,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -3012,7 +3012,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -3020,7 +3020,7 @@
                     "data": {
                       "type": "object",
                       "additionalProperties": {
-                        "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_core_update.LatestInfo"
+                        "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_core_update.LatestInfo"
                       }
                     }
                   }
@@ -3031,13 +3031,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -3067,7 +3067,7 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
@@ -3083,13 +3083,13 @@
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -3142,13 +3142,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub_RunLogResponse"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub_RunLogResponse"
                     }
                   }
                 }
@@ -3158,19 +3158,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -3245,13 +3245,13 @@
             "schema": {
               "allOf": [
                 {
-                  "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+                  "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
                 },
                 {
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_node_NodeLogResponse"
+                      "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_node_NodeLogResponse"
                     }
                   }
                 }
@@ -3261,19 +3261,19 @@
           "400": {
             "description": "请求参数错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "401": {
             "description": "未授权",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           },
           "500": {
             "description": "服务器内部错误",
             "schema": {
-              "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct"
+              "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct"
             }
           }
         }
@@ -3281,7 +3281,7 @@
     }
   },
   "definitions": {
-    "github_com_bestruirui_bestsub_internal_core_check.Desc": {
+    "github_com_evilCYH_nodehub_internal_core_check.Desc": {
       "type": "object",
       "properties": {
         "desc": {
@@ -3307,7 +3307,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_core_update.LatestInfo": {
+    "github_com_evilCYH_nodehub_internal_core_update.LatestInfo": {
       "type": "object",
       "properties": {
         "body": {
@@ -3324,7 +3324,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_auth.ChangePasswordRequest": {
+    "github_com_evilCYH_nodehub_internal_models_auth.ChangePasswordRequest": {
       "type": "object",
       "required": [
         "new_password",
@@ -3346,7 +3346,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_auth.Data": {
+    "github_com_evilCYH_nodehub_internal_models_auth.Data": {
       "type": "object",
       "properties": {
         "username": {
@@ -3354,7 +3354,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_auth.LoginRequest": {
+    "github_com_evilCYH_nodehub_internal_models_auth.LoginRequest": {
       "type": "object",
       "required": [
         "password",
@@ -3371,7 +3371,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_auth.LoginResponse": {
+    "github_com_evilCYH_nodehub_internal_models_auth.LoginResponse": {
       "type": "object",
       "properties": {
         "access_expires_at": {
@@ -3384,7 +3384,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_auth.UpdateUserInfoRequest": {
+    "github_com_evilCYH_nodehub_internal_models_auth.UpdateUserInfoRequest": {
       "type": "object",
       "required": [
         "username"
@@ -3396,7 +3396,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_check.Request": {
+    "github_com_evilCYH_nodehub_internal_models_check.Request": {
       "type": "object",
       "properties": {
         "config": {},
@@ -3408,11 +3408,11 @@
           "example": "测试检测任务"
         },
         "task": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Task"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Task"
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_check.Response": {
+    "github_com_evilCYH_nodehub_internal_models_check.Response": {
       "type": "object",
       "properties": {
         "config": {},
@@ -3426,17 +3426,17 @@
           "type": "string"
         },
         "result": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Result"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Result"
         },
         "status": {
           "type": "string"
         },
         "task": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_check.Task"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_check.Task"
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_check.Result": {
+    "github_com_evilCYH_nodehub_internal_models_check.Result": {
       "type": "object",
       "properties": {
         "duration": {
@@ -3451,7 +3451,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_check.Task": {
+    "github_com_evilCYH_nodehub_internal_models_check.Task": {
       "type": "object",
       "properties": {
         "cron_expr": {
@@ -3497,7 +3497,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_node.Filter": {
+    "github_com_evilCYH_nodehub_internal_models_node.Filter": {
       "type": "object",
       "properties": {
         "alive_status": {
@@ -3535,7 +3535,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_node.SimpleInfo": {
+    "github_com_evilCYH_nodehub_internal_models_node.SimpleInfo": {
       "type": "object",
       "properties": {
         "count": {
@@ -3555,7 +3555,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_notify.NameAndID": {
+    "github_com_evilCYH_nodehub_internal_models_notify.NameAndID": {
       "type": "object",
       "properties": {
         "id": {
@@ -3566,7 +3566,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_notify.Request": {
+    "github_com_evilCYH_nodehub_internal_models_notify.Request": {
       "type": "object",
       "properties": {
         "config": {},
@@ -3578,7 +3578,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_notify.Response": {
+    "github_com_evilCYH_nodehub_internal_models_notify.Response": {
       "type": "object",
       "properties": {
         "config": {},
@@ -3593,7 +3593,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_notify.Template": {
+    "github_com_evilCYH_nodehub_internal_models_notify.Template": {
       "type": "object",
       "properties": {
         "template": {
@@ -3604,7 +3604,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_setting.Setting": {
+    "github_com_evilCYH_nodehub_internal_models_setting.Setting": {
       "type": "object",
       "properties": {
         "key": {
@@ -3615,11 +3615,11 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_share.GenConfig": {
+    "github_com_evilCYH_nodehub_internal_models_share.GenConfig": {
       "type": "object",
       "properties": {
         "filter": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_node.Filter"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_node.Filter"
         },
         "proxy": {
           "type": "boolean"
@@ -3628,11 +3628,11 @@
           "type": "string"
         },
         "sub_converter": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.SubConverterConfig"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.SubConverterConfig"
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_share.Request": {
+    "github_com_evilCYH_nodehub_internal_models_share.Request": {
       "type": "object",
       "properties": {
         "enable": {
@@ -3642,7 +3642,7 @@
           "type": "integer"
         },
         "gen": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.GenConfig"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.GenConfig"
         },
         "max_access_count": {
           "type": "integer"
@@ -3655,7 +3655,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_share.Response": {
+    "github_com_evilCYH_nodehub_internal_models_share.Response": {
       "type": "object",
       "properties": {
         "access_count": {
@@ -3668,7 +3668,7 @@
           "type": "integer"
         },
         "gen": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_share.GenConfig"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_share.GenConfig"
         },
         "id": {
           "type": "integer"
@@ -3684,7 +3684,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_share.SubConverterConfig": {
+    "github_com_evilCYH_nodehub_internal_models_share.SubConverterConfig": {
       "type": "object",
       "properties": {
         "config": {
@@ -3695,7 +3695,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_storage.Request": {
+    "github_com_evilCYH_nodehub_internal_models_storage.Request": {
       "type": "object",
       "properties": {
         "config": {},
@@ -3709,7 +3709,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_storage.Response": {
+    "github_com_evilCYH_nodehub_internal_models_storage.Response": {
       "type": "object",
       "properties": {
         "config": {},
@@ -3724,7 +3724,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub.Config": {
+    "github_com_evilCYH_nodehub_internal_models_sub.Config": {
       "type": "object",
       "properties": {
         "protocol_filter": {
@@ -3750,11 +3750,11 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub.Request": {
+    "github_com_evilCYH_nodehub_internal_models_sub.Request": {
       "type": "object",
       "properties": {
         "config": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Config"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Config"
         },
         "cron_expr": {
           "type": "string",
@@ -3768,11 +3768,11 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub.Response": {
+    "github_com_evilCYH_nodehub_internal_models_sub.Response": {
       "type": "object",
       "properties": {
         "config": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Config"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Config"
         },
         "created_at": {
           "type": "string"
@@ -3787,13 +3787,13 @@
           "type": "integer"
         },
         "info": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_node.SimpleInfo"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_node.SimpleInfo"
         },
         "name": {
           "type": "string"
         },
         "result": {
-          "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub.Result"
+          "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub.Result"
         },
         "status": {
           "type": "string"
@@ -3803,7 +3803,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub.Result": {
+    "github_com_evilCYH_nodehub_internal_models_sub.Result": {
       "type": "object",
       "properties": {
         "duration": {
@@ -3829,7 +3829,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_system.HealthResponse": {
+    "github_com_evilCYH_nodehub_internal_models_system.HealthResponse": {
       "type": "object",
       "properties": {
         "database": {
@@ -3854,7 +3854,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_system.Info": {
+    "github_com_evilCYH_nodehub_internal_models_system.Info": {
       "type": "object",
       "properties": {
         "cpu_percent": {
@@ -3879,7 +3879,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_system.Version": {
+    "github_com_evilCYH_nodehub_internal_models_system.Version": {
       "type": "object",
       "properties": {
         "author": {
@@ -3902,7 +3902,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_modules_notify.Desc": {
+    "github_com_evilCYH_nodehub_internal_modules_notify.Desc": {
       "type": "object",
       "properties": {
         "desc": {
@@ -3928,7 +3928,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_modules_storage.Desc": {
+    "github_com_evilCYH_nodehub_internal_modules_storage.Desc": {
       "type": "object",
       "properties": {
         "desc": {
@@ -3954,7 +3954,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_server_resp.ResponseStruct": {
+    "github_com_evilCYH_nodehub_internal_server_resp.ResponseStruct": {
       "type": "object",
       "properties": {
         "code": {
@@ -3968,7 +3968,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub_RunLog": {
+    "github_com_evilCYH_nodehub_internal_models_sub_RunLog": {
       "type": "object",
       "properties": {
         "id": {
@@ -3998,7 +3998,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub_RunEvent": {
+    "github_com_evilCYH_nodehub_internal_models_sub_RunEvent": {
       "type": "object",
       "properties": {
         "id": {
@@ -4029,24 +4029,24 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_sub_RunLogResponse": {
+    "github_com_evilCYH_nodehub_internal_models_sub_RunLogResponse": {
       "type": "object",
       "properties": {
         "runs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub_RunLog"
+            "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub_RunLog"
           }
         },
         "events": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_sub_RunEvent"
+            "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_sub_RunEvent"
           }
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_node_NodeLog": {
+    "github_com_evilCYH_nodehub_internal_models_node_NodeLog": {
       "type": "object",
       "properties": {
         "id": {
@@ -4083,7 +4083,7 @@
         }
       }
     },
-    "github_com_bestruirui_bestsub_internal_models_node_NodeLogResponse": {
+    "github_com_evilCYH_nodehub_internal_models_node_NodeLogResponse": {
       "type": "object",
       "properties": {
         "total": {
@@ -4093,7 +4093,7 @@
         "list": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/github_com_bestruirui_bestsub_internal_models_node_NodeLog"
+            "$ref": "#/definitions/github_com_evilCYH_nodehub_internal_models_node_NodeLog"
           }
         }
       }

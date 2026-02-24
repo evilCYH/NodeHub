@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/op"
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
-	"github.com/bestruirui/bestsub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
 	"github.com/gin-gonic/gin"
 )
 

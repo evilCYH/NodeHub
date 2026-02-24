@@ -3,7 +3,7 @@ package channel
 import (
 	"net/http"
 
-	"github.com/bestruirui/bestsub/internal/utils/ua"
+	"github.com/evilCYH/NodeHub/internal/utils/ua"
 )
 
 type Common struct {

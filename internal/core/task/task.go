@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
 	"github.com/panjf2000/ants/v2"
 )
 

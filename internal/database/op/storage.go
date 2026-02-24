@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/storage"
-	"github.com/bestruirui/bestsub/internal/utils/cache"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/storage"
+	"github.com/evilCYH/NodeHub/internal/utils/cache"
 )
 
 var storageRepo interfaces.StorageRepository

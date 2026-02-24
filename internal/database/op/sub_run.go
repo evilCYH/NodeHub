@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	subModel "github.com/bestruirui/bestsub/internal/models/sub"
+	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
 )
 
 func CreateSubRun(ctx context.Context, run *subModel.RunLog) error {

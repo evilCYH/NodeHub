@@ -3,7 +3,7 @@ package node
 import (
 	"sync"
 
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
 )
 
 var (

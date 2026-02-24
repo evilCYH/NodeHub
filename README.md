@@ -1,6 +1,6 @@
-# BestSub
+# NodeHub
 
-BestSub 是一个高性能的节点检测，订阅转换服务，基于 Go 语言开发。该项目提供了完整的 Web 界面和 API 接口，支持多种检测项目，多种订阅格式转换，为用户提供便捷的订阅管理解决方案。
+NodeHub 是一个高性能的节点检测，订阅转换服务，基于 Go 语言开发。该项目提供了完整的 Web 界面和 API 接口，支持多种检测项目，多种订阅格式转换，为用户提供便捷的订阅管理解决方案。
 
 ## ✨ 主要特性
 
@@ -18,7 +18,7 @@ BestSub 是一个高性能的节点检测，订阅转换服务，基于 Go 语�
 
 ### 方式一：直接运行
 
-1. 从 [Releases](https://github.com/bestruirui/BestSub/releases/latest) 页面下载适合您系统架构的可执行文件
+1. 从 [Releases](https://github.com/evilCYH/NodeHub/releases/latest) 页面下载适合您系统架构的可执行文件
 2. 直接运行程序，系统将自动：
    - 创建必要的配置文件
 
@@ -26,17 +26,17 @@ BestSub 是一个高性能的节点检测，订阅转换服务，基于 Go 语�
 
 ```bash
 docker run -d \
-    --name bestsub \
+    --name nodehub \
     -e PUID=1000 \
     -e PGID=1000 \
     --restart unless-stopped \
     -v /path/to/data:/app/data \
     -p 8080:8080 \
-    ghcr.io/bestruirui/bestsub
+    ghcr.io/evilcyh/nodehub
 ```
 
 **参数说明:**
-- `--name bestsub`: 设置容器名称
+- `--name nodehub`: 设置容器名称
 - `--restart unless-stopped`: 容器自动重启策略
 - `-v /path/to/data:/app/data`: 数据持久化挂载（请将 `/path/to/data` 替换为您的实际路径）
 - `-p 8080:8080`: 端口映射，访问地址为 `http://localhost:8080`
@@ -47,9 +47,9 @@ docker run -d \
 
 ```yaml
 services:
-  bestsub:
-    image: ghcr.io/bestruirui/bestsub:latest
-    container_name: bestsub
+  nodehub:
+    image: ghcr.io/evilcyh/nodehub:latest
+    container_name: nodehub
     restart: unless-stopped
     environment:
       - PUID=1000
@@ -70,13 +70,13 @@ docker-compose up -d
 程序运行后将创建以下目录结构：
 
 ```
-bestsub/
+nodehub/
 ├── config.json              # 主配置文件
 ├── data/                    # 数据目录
-│   └── bestsub.db          # SQLite 数据库文件
+│   └── nodehub.db          # SQLite 数据库文件
 ├── log/                     # 日志文件目录
 ├── session/                 # 会话数据目录
-│   └── bestsub.session     # 会话文件
+│   └── nodehub.session     # 会话文件
 ```
 
 ## 🔗 版本历史
@@ -88,8 +88,8 @@ bestsub/
 
 ### 经典版本 (v0.3.5)
 - **命令行界面版本**
-- **[📖 查看文档](https://github.com/bestruirui/BestSub/blob/legacy/doc/README_zh.md)** 
-- **[⬇️ 下载应用](https://github.com/bestruirui/BestSub/releases/tag/v0.3.5)**
+- **[📖 查看文档](https://github.com/evilCYH/NodeHub)** 
+- **[⬇️ 下载应用](https://github.com/evilCYH/NodeHub/releases/latest)**
 
 ## 📋 版本规范
 

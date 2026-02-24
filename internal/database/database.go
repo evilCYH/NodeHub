@@ -3,10 +3,10 @@ package database
 import (
 	"context"
 
-	"github.com/bestruirui/bestsub/internal/database/client/sqlite"
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/client/sqlite"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 func Initialize(sqltype, path string) error {

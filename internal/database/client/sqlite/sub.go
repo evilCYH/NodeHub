@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/sub"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/sub"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 type SubRepository struct {

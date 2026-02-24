@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"time"
 
-	sys "github.com/bestruirui/bestsub/internal/core/system"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/system"
-	"github.com/bestruirui/bestsub/internal/server/middleware"
-	"github.com/bestruirui/bestsub/internal/server/resp"
-	"github.com/bestruirui/bestsub/internal/server/router"
-	"github.com/bestruirui/bestsub/internal/utils/info"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	sys "github.com/evilCYH/NodeHub/internal/core/system"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/system"
+	"github.com/evilCYH/NodeHub/internal/server/middleware"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/utils/info"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/gin-gonic/gin"
 )
 

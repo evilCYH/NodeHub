@@ -17,13 +17,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . ./
 COPY --from=web-build /app/web/out /app/static/out
-RUN go build -o bestsub ./cmd/bestsub
+RUN go build -o nodehub ./cmd/nodehub
 
 FROM alpine:3.20
 WORKDIR /app
-COPY --from=go-build /app/bestsub ./bestsub
+COPY --from=go-build /app/nodehub ./nodehub
 VOLUME ["/data"]
-ENV BESTSUB_SERVER_HOST=0.0.0.0
-ENV BESTSUB_SERVER_PORT=8080
+ENV NODEHUB_SERVER_HOST=0.0.0.0
+ENV NODEHUB_SERVER_PORT=8080
 EXPOSE 8080
-CMD ["./bestsub", "-c", "/data/config.json"]
+CMD ["./nodehub", "-c", "/data/config.json"]

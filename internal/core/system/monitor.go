@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/models/system"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/models/system"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/shirou/gopsutil/v4/process"
 )
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
 )
 
 type NodeLogRepository struct {

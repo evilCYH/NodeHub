@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bestruirui/bestsub/internal/database/op"
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
-	"github.com/bestruirui/bestsub/internal/server/middleware"
-	"github.com/bestruirui/bestsub/internal/server/resp"
-	"github.com/bestruirui/bestsub/internal/server/router"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"github.com/evilCYH/NodeHub/internal/server/middleware"
+	"github.com/evilCYH/NodeHub/internal/server/resp"
+	"github.com/evilCYH/NodeHub/internal/server/router"
 	"github.com/gin-gonic/gin"
 )
 

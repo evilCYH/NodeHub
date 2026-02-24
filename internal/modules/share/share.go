@@ -9,13 +9,13 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/core/node"
-	"github.com/bestruirui/bestsub/internal/core/subconv"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	nodeModel "github.com/bestruirui/bestsub/internal/models/node"
-	"github.com/bestruirui/bestsub/internal/models/share"
-	"github.com/bestruirui/bestsub/internal/utils"
-	"github.com/bestruirui/bestsub/internal/utils/country"
+	"github.com/evilCYH/NodeHub/internal/core/node"
+	"github.com/evilCYH/NodeHub/internal/core/subconv"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"github.com/evilCYH/NodeHub/internal/models/share"
+	"github.com/evilCYH/NodeHub/internal/utils"
+	"github.com/evilCYH/NodeHub/internal/utils/country"
 )
 
 func GenSubData(genConfigStr string) []byte {

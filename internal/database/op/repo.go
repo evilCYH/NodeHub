@@ -1,7 +1,7 @@
 package op
 
 import (
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
 )
 
 var repo interfaces.Repository

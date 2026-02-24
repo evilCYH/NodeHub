@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/database/interfaces"
-	"github.com/bestruirui/bestsub/internal/models/share"
-	"github.com/bestruirui/bestsub/internal/utils/cache"
-	"github.com/bestruirui/bestsub/internal/utils/generic"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/database/interfaces"
+	"github.com/evilCYH/NodeHub/internal/models/share"
+	"github.com/evilCYH/NodeHub/internal/utils/cache"
+	"github.com/evilCYH/NodeHub/internal/utils/generic"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 var shareRepo interfaces.ShareRepository

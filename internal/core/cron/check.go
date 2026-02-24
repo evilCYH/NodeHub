@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bestruirui/bestsub/internal/core/check"
-	"github.com/bestruirui/bestsub/internal/core/node"
-	"github.com/bestruirui/bestsub/internal/database/op"
-	checkModel "github.com/bestruirui/bestsub/internal/models/check"
-	"github.com/bestruirui/bestsub/internal/utils/generic"
-	"github.com/bestruirui/bestsub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/core/check"
+	"github.com/evilCYH/NodeHub/internal/core/node"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	checkModel "github.com/evilCYH/NodeHub/internal/models/check"
+	"github.com/evilCYH/NodeHub/internal/utils/generic"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 	"github.com/robfig/cron/v3"
 )
 

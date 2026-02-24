@@ -1,6 +1,6 @@
 package migration
 
-import "github.com/bestruirui/bestsub/internal/database/migration"
+import "github.com/evilCYH/NodeHub/internal/database/migration"
 
 // Migration003AddSubRunAndNodeLogs 添加订阅运行日志和节点日志表
 func Migration003AddSubRunAndNodeLogs() string {

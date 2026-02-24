@@ -1,9 +1,9 @@
 package register
 
 import (
-	"github.com/bestruirui/bestsub/internal/models/check"
-	"github.com/bestruirui/bestsub/internal/models/notify"
-	"github.com/bestruirui/bestsub/internal/models/storage"
+	"github.com/evilCYH/NodeHub/internal/models/check"
+	"github.com/evilCYH/NodeHub/internal/models/notify"
+	"github.com/evilCYH/NodeHub/internal/models/storage"
 )
 
 func Notify(i notify.Instance) {

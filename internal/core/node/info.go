@@ -1,6 +1,6 @@
 package node
 
-import nodeModel "github.com/bestruirui/bestsub/internal/models/node"
+import nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
 
 func RefreshInfo() {
 	refreshMutex.Lock()

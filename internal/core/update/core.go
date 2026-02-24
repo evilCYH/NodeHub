@@ -8,10 +8,10 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/bestruirui/bestsub/internal/database/op"
-	"github.com/bestruirui/bestsub/internal/models/setting"
-	"github.com/bestruirui/bestsub/internal/utils/log"
-	"github.com/bestruirui/bestsub/internal/utils/shutdown"
+	"github.com/evilCYH/NodeHub/internal/database/op"
+	"github.com/evilCYH/NodeHub/internal/models/setting"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
+	"github.com/evilCYH/NodeHub/internal/utils/shutdown"
 )
 
 func UpdateCore() error {
@@ -36,9 +36,9 @@ func updateCore() error {
 	case "windows":
 		switch arch {
 		case "386":
-			filename = "bestsub-windows-x86.zip"
+			filename = "nodehub-windows-x86.zip"
 		case "amd64":
-			filename = "bestsub-windows-x86_64.zip"
+			filename = "nodehub-windows-x86_64.zip"
 		default:
 			log.Errorf("unsupported windows architecture: %s", arch)
 			return fmt.Errorf("unsupported windows architecture: %s", arch)
@@ -46,9 +46,9 @@ func updateCore() error {
 	case "darwin":
 		switch arch {
 		case "amd64":
-			filename = "bestsub-darwin-x86_64.zip"
+			filename = "nodehub-darwin-x86_64.zip"
 		case "arm64":
-			filename = "bestsub-darwin-arm64.zip"
+			filename = "nodehub-darwin-arm64.zip"
 		default:
 			log.Errorf("unsupported darwin architecture: %s", arch)
 			return fmt.Errorf("unsupported darwin architecture: %s", arch)
@@ -56,13 +56,13 @@ func updateCore() error {
 	case "linux":
 		switch arch {
 		case "386":
-			filename = "bestsub-linux-x86.zip"
+			filename = "nodehub-linux-x86.zip"
 		case "amd64":
-			filename = "bestsub-linux-x86_64.zip"
+			filename = "nodehub-linux-x86_64.zip"
 		case "arm":
-			filename = "bestsub-linux-armv7.zip"
+			filename = "nodehub-linux-armv7.zip"
 		case "arm64":
-			filename = "bestsub-linux-arm64.zip"
+			filename = "nodehub-linux-arm64.zip"
 		default:
 			log.Errorf("unsupported linux architecture: %s", arch)
 			return fmt.Errorf("unsupported linux architecture: %s", arch)
@@ -72,7 +72,7 @@ func updateCore() error {
 		return fmt.Errorf("unsupported operating system: %s", goos)
 	}
 
-	downloadUrl = bestsubUpdateUrl + "/" + filename
+	downloadUrl = nodehubUpdateUrl + "/" + filename
 
 	bytes, err := download(downloadUrl, op.GetSettingBool(setting.PROXY_ENABLE))
 	if err != nil {
