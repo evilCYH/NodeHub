@@ -1,10 +1,9 @@
-import { Badge } from "@/src/components/ui/badge"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/src/components/ui/table"
 import { InlineLoading } from "@/src/components/ui/loading"
 import { formatSpeed } from "@/src/components/features/sub/utils"
 import { formatTime } from "@/src/utils"
-import { formatNodeStatus, getRiskClass, getRiskLabel } from "../utils"
+import { getRiskClass, getRiskLabel } from "../utils"
 import { NODE_STATUS } from "../constants"
 import type { NodeResponse } from "@/src/types"
 
@@ -64,7 +63,6 @@ export function NodesTable({ nodes, isLoading, error }: NodesTableProps) {
                         <TableRow>
                             <TableHead>节点名称</TableHead>
                             <TableHead>类型</TableHead>
-                            <TableHead>状态</TableHead>
                             {orderedNodes.some((node) => node.alive_status & NODE_STATUS.ALIVE) ? (
                                 <>
                                     <TableHead>延迟</TableHead>
@@ -85,7 +83,6 @@ export function NodesTable({ nodes, isLoading, error }: NodesTableProps) {
                     </TableHeader>
                     <TableBody>
                         {orderedNodes.map((node) => {
-                            const statusLabels = formatNodeStatus(node.alive_status)
                             const isAlive = (node.alive_status & NODE_STATUS.ALIVE) !== 0
                             const lastCheck = formatTime(node.last_check_at) || '未知'
                             const lastSource = node.last_check_source || '未知'
@@ -100,15 +97,6 @@ export function NodesTable({ nodes, isLoading, error }: NodesTableProps) {
 								) : null}
                                 </TableCell>
                                     <TableCell>{node.type || 'N/A'}</TableCell>
-                                    <TableCell className="space-x-1">
-                                        {statusLabels.length === 0 ? (
-                                            <Badge variant="outline">非存活</Badge>
-                                        ) : (
-                                            statusLabels.map((label) => (
-                                                <Badge key={label} variant="outline">{label}</Badge>
-                                            ))
-                                        )}
-                                    </TableCell>
                                     {isAlive ? (
                                         <>
                                             <TableCell>{node.delay ? `${node.delay}ms` : 'N/A'}</TableCell>
