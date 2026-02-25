@@ -1,6 +1,6 @@
 import { API_PATH } from '../config/config'
 import { tokenManager } from './token-manager'
-import type { LoginResponse, UserInfo, ApiResponse, SubResponse, CheckResponse, CheckRequest, SubRequest, DynamicConfigItem, SubNameAndID, NotifyResponse, NotifyRequest, NotifyTemplate, NotifyChannel, NotifyChannelConfigResponse, ShareResponse, ShareRequest, Setting, ChangePasswordRequest, UpdateUserInfoRequest, UpdateResponse, UpdateComponent, SystemVersion, NodeResponse, NodeUpdateLogResponse, NodeTestLogResponse, SubRunLogResponse, NodeLogResponse } from '@/src/types'
+import type { LoginResponse, UserInfo, ApiResponse, SubResponse, CheckResponse, CheckRequest, SubRequest, DynamicConfigItem, SubNameAndID, NotifyResponse, NotifyRequest, NotifyTemplate, NotifyChannel, NotifyChannelConfigResponse, ShareResponse, ShareRequest, Setting, ChangePasswordRequest, UpdateUserInfoRequest, UpdateResponse, UpdateComponent, SystemVersion, NodeResponse, NodeDetailResponse, NodeUpdateLogResponse, NodeTestLogResponse, SubRunLogResponse, NodeLogResponse } from '@/src/types'
 
 const DEFAULT_REQUEST_HEADERS: Record<string, string> = {}
 
@@ -251,6 +251,21 @@ export const api = {
 
   async getNodeUpdateLog(subId: number, limit = 5): Promise<NodeUpdateLogResponse> {
     const response = await apiClient.get<ApiResponse<NodeUpdateLogResponse>>(`${API_PATH.node}/log?sub_id=${subId}&limit=${limit}`)
+    return response.data
+  },
+
+  async getNodeDetail(params: {
+    subId: number
+    uniqueKey: number | string
+    scope?: 'registry' | 'pool'
+  }): Promise<NodeDetailResponse> {
+    const { subId, uniqueKey, scope = 'registry' } = params
+    const keyParam = typeof uniqueKey === 'string'
+      ? `unique_key_str=${encodeURIComponent(uniqueKey)}`
+      : `unique_key=${uniqueKey}`
+    const response = await apiClient.get<ApiResponse<NodeDetailResponse>>(
+      `${API_PATH.node}/detail?sub_id=${subId}&${keyParam}&scope=${scope}`
+    )
     return response.data
   },
 

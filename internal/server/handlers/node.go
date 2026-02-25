@@ -22,6 +22,10 @@ func init() {
 				Handle(getNodes),
 		).
 		AddRoute(
+			router.NewRoute("/detail", router.GET).
+				Handle(getNodeDetail),
+		).
+		AddRoute(
 			router.NewRoute("/log", router.GET).
 				Handle(getNodeUpdateLog),
 		)
@@ -100,13 +104,14 @@ func getNodes(c *gin.Context) {
 				}
 			}
 			item := nodeModel.Response{
-				SubID:       n.Base.SubId,
-				UniqueKey:   n.Base.UniqueKey,
-				Name:        meta.Name,
-				Type:        meta.Type,
-				Country:     "",
-				AliveStatus: 0,
-				InitStatus:  nodeModel.InitPassed,
+				SubID:        n.Base.SubId,
+				UniqueKey:    n.Base.UniqueKey,
+				UniqueKeyStr: strconv.FormatUint(n.Base.UniqueKey, 10),
+				Name:         meta.Name,
+				Type:         meta.Type,
+				Country:      "",
+				AliveStatus:  0,
+				InitStatus:   nodeModel.InitPassed,
 			}
 			if n.Info != nil {
 				item.Delay = n.Info.Delay.Average()
@@ -137,6 +142,7 @@ func getNodes(c *gin.Context) {
 				item := nodeModel.Response{
 					SubID:           record.Base.SubId,
 					UniqueKey:       record.Base.UniqueKey,
+					UniqueKeyStr:    strconv.FormatUint(record.Base.UniqueKey, 10),
 					Name:            meta.Name,
 					Type:            meta.Type,
 					Country:         "",
@@ -179,17 +185,18 @@ func getNodes(c *gin.Context) {
 				continue
 			}
 			respData = append(respData, nodeModel.Response{
-				SubID:       fn.SubID,
-				UniqueKey:   fn.UniqueKey,
-				Name:        fn.Name,
-				Type:        fn.Type,
-				Reason:      fn.Reason,
-				Delay:       0,
-				SpeedUp:     0,
-				SpeedDown:   0,
-				Risk:        0,
-				AliveStatus: 0,
-				Country:     "",
+				SubID:        fn.SubID,
+				UniqueKey:    fn.UniqueKey,
+				UniqueKeyStr: strconv.FormatUint(fn.UniqueKey, 10),
+				Name:         fn.Name,
+				Type:         fn.Type,
+				Reason:       fn.Reason,
+				Delay:        0,
+				SpeedUp:      0,
+				SpeedDown:    0,
+				Risk:         0,
+				AliveStatus:  0,
+				Country:      "",
 			})
 		}
 	}
@@ -215,6 +222,133 @@ func parseSubIDs(raw string) ([]uint16, error) {
 		return nil, errors.New("empty sub_id")
 	}
 	return ids, nil
+}
+
+func parseNodeMeta(raw []byte, fallbackName, fallbackType string) (nodeMeta, map[string]any) {
+	meta := nodeMeta{Name: fallbackName, Type: fallbackType}
+	var cfg map[string]any
+	if err := yaml.Unmarshal(raw, &cfg); err != nil {
+		return meta, map[string]any{}
+	}
+	if name, ok := cfg["name"].(string); ok && name != "" {
+		meta.Name = name
+	}
+	if nodeType, ok := cfg["type"].(string); ok && nodeType != "" {
+		meta.Type = nodeType
+	}
+	return meta, cfg
+}
+
+// getNodeDetail 获取节点详情
+// @Summary 获取节点详情
+// @Description 通过 sub_id 与 unique_key 获取单个节点详情（含原始配置）
+// @Tags 节点
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param sub_id query int true "订阅ID"
+// @Param unique_key query int true "节点唯一键"
+// @Param scope query string false "数据范围：registry|pool，默认 registry"
+// @Success 200 {object} resp.ResponseStruct{data=node.DetailResponse} "获取成功"
+// @Failure 400 {object} resp.ResponseStruct "请求参数错误"
+// @Failure 401 {object} resp.ResponseStruct "未授权"
+// @Failure 404 {object} resp.ResponseStruct "节点不存在"
+// @Router /api/v1/node/detail [get]
+func getNodeDetail(c *gin.Context) {
+	subIDStr := strings.TrimSpace(c.Query("sub_id"))
+	uniqueKeyStr := strings.TrimSpace(c.Query("unique_key"))
+	if uniqueKeyStr == "" {
+		uniqueKeyStr = strings.TrimSpace(c.Query("unique_key_str"))
+	}
+	scope := strings.TrimSpace(c.Query("scope"))
+	if scope == "" {
+		scope = "registry"
+	}
+	if subIDStr == "" || uniqueKeyStr == "" {
+		resp.ErrorBadRequest(c)
+		return
+	}
+	subIDRaw, err := strconv.ParseUint(subIDStr, 10, 16)
+	if err != nil {
+		resp.ErrorBadRequest(c)
+		return
+	}
+	uniqueKey, err := strconv.ParseUint(uniqueKeyStr, 10, 64)
+	if err != nil {
+		resp.ErrorBadRequest(c)
+		return
+	}
+	subID := uint16(subIDRaw)
+
+	if scope == "pool" {
+		nodes := node.GetAll()
+		for _, n := range nodes {
+			if n.Base.SubId != subID || n.Base.UniqueKey != uniqueKey {
+				continue
+			}
+			meta, raw := parseNodeMeta(n.Base.Raw, "", "")
+			item := nodeModel.DetailResponse{
+				Response: nodeModel.Response{
+					SubID:        n.Base.SubId,
+					UniqueKey:    n.Base.UniqueKey,
+					UniqueKeyStr: strconv.FormatUint(n.Base.UniqueKey, 10),
+					Name:         meta.Name,
+					Type:         meta.Type,
+					Country:      "",
+					AliveStatus:  0,
+					InitStatus:   nodeModel.InitPassed,
+				},
+				Raw: raw,
+			}
+			if n.Info != nil {
+				item.Delay = n.Info.Delay.Average()
+				item.SpeedUp = n.Info.SpeedUp.Average()
+				item.SpeedDown = n.Info.SpeedDown.Average()
+				item.Risk = n.Info.Risk
+				item.AliveStatus = n.Info.AliveStatus
+				item.Country = n.Info.Country
+			}
+			resp.Success(c, item)
+			return
+		}
+		resp.Error(c, 404, "node not found")
+		return
+	}
+
+	records := node.GetRegistryBySubId([]uint16{subID})
+	for _, record := range records {
+		if record.Base.UniqueKey != uniqueKey {
+			continue
+		}
+		meta, raw := parseNodeMeta(record.Base.Raw, "", "")
+		item := nodeModel.DetailResponse{
+			Response: nodeModel.Response{
+				SubID:           record.Base.SubId,
+				UniqueKey:       record.Base.UniqueKey,
+				UniqueKeyStr:    strconv.FormatUint(record.Base.UniqueKey, 10),
+				Name:            meta.Name,
+				Type:            meta.Type,
+				Country:         "",
+				AliveStatus:     0,
+				InitStatus:      record.InitStatus,
+				LastCheckAt:     record.LastCheckAt,
+				LastCheckSource: record.LastCheckSource,
+				LastFailReason:  record.LastFailReason,
+			},
+			Raw: raw,
+		}
+		if record.Info != nil {
+			item.Delay = record.Info.Delay.Average()
+			item.SpeedUp = record.Info.SpeedUp.Average()
+			item.SpeedDown = record.Info.SpeedDown.Average()
+			item.Risk = record.Info.Risk
+			item.AliveStatus = record.Info.AliveStatus
+			item.Country = record.Info.Country
+		}
+		resp.Success(c, item)
+		return
+	}
+	resp.Error(c, 404, "node not found")
 }
 
 // getNodeUpdateLog 获取订阅节点更新日志

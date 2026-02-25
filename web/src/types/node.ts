@@ -1,6 +1,7 @@
 export interface NodeResponse {
     sub_id: number
     unique_key: number
+    unique_key_str?: string
     name: string
     type: string
     reason?: string
@@ -14,6 +15,10 @@ export interface NodeResponse {
     last_check_at?: string
     last_check_source?: string
     last_fail_reason?: string
+}
+
+export interface NodeDetailResponse extends NodeResponse {
+    raw: Record<string, unknown>
 }
 
 export interface NodeUpdateLog {
