@@ -33,8 +33,8 @@ func (db *DB) NodeUpdateLog() interfaces.NodeUpdateLogRepository {
 
 func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 	log.Debugf("Create sub")
-	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, created_at, updated_at)
-	          VALUES (?, ?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, upload, download, total, expire, info_updated_at, created_at, updated_at)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	now := time.Now()
 	result, err := r.db.db.ExecContext(ctx, query,
@@ -43,6 +43,11 @@ func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 		link.Tags,
 		link.CronExpr,
 		link.Config,
+		link.Upload,
+		link.Download,
+		link.Total,
+		link.Expire,
+		link.InfoUpdatedAt,
 		now,
 		now,
 	)
@@ -65,7 +70,7 @@ func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 
 func (r *SubRepository) GetByID(ctx context.Context, id uint16) (*sub.Data, error) {
 	log.Debugf("Get sub by id")
-	query := `SELECT id, enable, name, tags, cron_expr, config, result, created_at, updated_at
+	query := `SELECT id, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
 	          FROM sub WHERE id = ?`
 
 	var s sub.Data
@@ -77,6 +82,11 @@ func (r *SubRepository) GetByID(ctx context.Context, id uint16) (*sub.Data, erro
 		&s.CronExpr,
 		&s.Config,
 		&s.Result,
+		&s.Upload,
+		&s.Download,
+		&s.Total,
+		&s.Expire,
+		&s.InfoUpdatedAt,
 		&s.CreatedAt,
 		&s.UpdatedAt,
 	)
@@ -93,7 +103,7 @@ func (r *SubRepository) GetByID(ctx context.Context, id uint16) (*sub.Data, erro
 
 func (r *SubRepository) Update(ctx context.Context, data *sub.Data) error {
 	log.Debugf("Update sub")
-	query := `UPDATE sub SET enable = ?, name = ?, tags = ?, cron_expr = ?, config = ?, result = ?, updated_at = ? WHERE id = ?`
+	query := `UPDATE sub SET enable = ?, name = ?, tags = ?, cron_expr = ?, config = ?, result = ?, upload = ?, download = ?, total = ?, expire = ?, info_updated_at = ?, updated_at = ? WHERE id = ?`
 	data.UpdatedAt = time.Now()
 	_, err := r.db.db.ExecContext(ctx, query,
 		data.Enable,
@@ -102,6 +112,11 @@ func (r *SubRepository) Update(ctx context.Context, data *sub.Data) error {
 		data.CronExpr,
 		data.Config,
 		data.Result,
+		data.Upload,
+		data.Download,
+		data.Total,
+		data.Expire,
+		data.InfoUpdatedAt,
 		data.UpdatedAt,
 		data.ID,
 	)
@@ -127,7 +142,7 @@ func (r *SubRepository) Delete(ctx context.Context, id uint16) error {
 
 func (r *SubRepository) List(ctx context.Context) (*[]sub.Data, error) {
 	log.Debugf("List sub")
-	query := `SELECT id, enable, name, tags, cron_expr, config, result, created_at, updated_at
+	query := `SELECT id, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
 	          FROM sub ORDER BY id DESC`
 
 	rows, err := r.db.db.QueryContext(ctx, query)
@@ -147,6 +162,11 @@ func (r *SubRepository) List(ctx context.Context) (*[]sub.Data, error) {
 			&s.CronExpr,
 			&s.Config,
 			&s.Result,
+			&s.Upload,
+			&s.Download,
+			&s.Total,
+			&s.Expire,
+			&s.InfoUpdatedAt,
 			&s.CreatedAt,
 			&s.UpdatedAt,
 		)
@@ -180,8 +200,8 @@ func (r *SubRepository) BatchCreate(ctx context.Context, links []*sub.Data) erro
 		}
 	}()
 
-	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, created_at, updated_at)
-	          VALUES (?, ?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, upload, download, total, expire, info_updated_at, created_at, updated_at)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	now := time.Now()
 	stmt, err := tx.PrepareContext(ctx, query)
@@ -197,6 +217,11 @@ func (r *SubRepository) BatchCreate(ctx context.Context, links []*sub.Data) erro
 			link.Tags,
 			link.CronExpr,
 			link.Config,
+			link.Upload,
+			link.Download,
+			link.Total,
+			link.Expire,
+			link.InfoUpdatedAt,
 			now,
 			now,
 		)
@@ -218,5 +243,15 @@ func (r *SubRepository) BatchCreate(ctx context.Context, links []*sub.Data) erro
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
+	return nil
+}
+
+func (r *SubRepository) UpdateSubInfo(ctx context.Context, id uint16, upload, download, total, expire int64, infoUpdatedAt *time.Time) error {
+	log.Debugf("Update sub info")
+	query := `UPDATE sub SET upload = ?, download = ?, total = ?, expire = ?, info_updated_at = ? WHERE id = ?`
+	_, err := r.db.db.ExecContext(ctx, query, upload, download, total, expire, infoUpdatedAt, id)
+	if err != nil {
+		return fmt.Errorf("failed to update sub info: %w", err)
+	}
 	return nil
 }

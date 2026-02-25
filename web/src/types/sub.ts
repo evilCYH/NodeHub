@@ -45,6 +45,11 @@ export interface SubResponse {
     status: string
     result: SubResult
     info: SubNodeInfo
+    upload: number
+    download: number
+    total: number
+    expire: number
+    info_updated_at?: string | null
     created_at: string
     updated_at: string
 }

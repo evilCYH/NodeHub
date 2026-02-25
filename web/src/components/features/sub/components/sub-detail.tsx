@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog"
-import { formatTime, formatLastRunTime, getNextCronRunTime, formatDuration } from "@/src/utils"
+import { formatTime, formatLastRunTime, getNextCronRunTime, formatDuration, formatBytes, formatExpireStatus, formatTrafficSummary } from "@/src/utils"
 import { useNodeUpdateLog } from "@/src/lib/queries/node-log-queries"
 import StatusBadge from "@/src/components/shared/status-badge"
 import type { SubResponse } from "@/src/types/sub"
@@ -26,6 +26,15 @@ export function SubDetail({
         if (risk <= 3) return 'text-yellow-600'
         return 'text-red-600'
     }
+    const traffic = formatTrafficSummary(subscription.upload, subscription.download, subscription.total)
+    const expire = formatExpireStatus(subscription.expire)
+    const expireClass = expire.state === 'expired'
+        ? 'text-red-600'
+        : expire.state === 'warning'
+            ? 'text-yellow-600'
+            : expire.state === 'permanent'
+                ? 'text-green-600'
+                : 'text-muted-foreground'
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -98,6 +107,32 @@ export function SubDetail({
                                 <div className="text-muted-foreground"><span>初测失败:</span> <span className="font-medium">{latestLog?.test_failed ?? 0}</span></div>
                                 <div className="text-muted-foreground"><span>通过初测:</span> <span className="font-medium text-green-600">{latestLog?.accepted ?? 0}</span></div>
                                 <div className="text-muted-foreground"><span>被淘汰:</span> <span className="font-medium">{latestLog?.dropped ?? 0}</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="font-semibold mb-2">流量与到期</h3>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-2">
+                                <div className="text-muted-foreground"><span>上传流量:</span> {formatBytes(subscription.upload)}</div>
+                                <div className="text-muted-foreground"><span>下载流量:</span> {formatBytes(subscription.download)}</div>
+                                <div className="text-muted-foreground">
+                                    <span>已用流量:</span>
+                                    <span className={`ml-1 ${traffic.isOverLimit ? 'text-red-600' : 'text-green-600'}`}>
+                                        {traffic.usedText}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="text-muted-foreground"><span>总流量:</span> {traffic.totalText}</div>
+                                <div className="text-muted-foreground">
+                                    <span>到期状态:</span>
+                                    <span className={`ml-1 ${expireClass}`}>{expire.label}</span>
+                                </div>
+                                {traffic.isOverLimit ? (
+                                    <div className="text-red-600">已超限</div>
+                                ) : null}
                             </div>
                         </div>
                     </div>

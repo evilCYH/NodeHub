@@ -6,17 +6,21 @@ import { SubDetail } from "./sub-detail"
 import { SubList } from "./sub-list"
 import { SubLogDialog } from "./sub-log-dialog"
 import { BatchSubForm } from "./batch-sub-form"
+import { useSubs } from "@/src/lib/queries/sub-queries"
 import type { SubResponse } from "@/src/types/sub"
 
 export function SubPage() {
-    const [detailSubscription, setDetailSubscription] = useState<SubResponse | null>(null)
+    const { data: subs = [] } = useSubs()
+    const [detailSubscriptionId, setDetailSubscriptionId] = useState<number | null>(null)
     const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false)
     const [isBatchFormDialogOpen, setIsBatchFormDialogOpen] = useState(false)
     const [editingSubscription, setEditingSubscription] = useState<SubResponse | null>(null)
     const [logSubscription, setLogSubscription] = useState<SubResponse | null>(null)
     const [isLogDialogOpen, setIsLogDialogOpen] = useState(false)
-
+    const detailSubscription = detailSubscriptionId == null
+        ? null
+        : subs.find(item => item.id === detailSubscriptionId) ?? null
 
     const handleEdit = (subscription: SubResponse) => {
         setEditingSubscription(subscription)
@@ -43,7 +47,7 @@ export function SubPage() {
 
 
     const showDetail = (subscription: SubResponse) => {
-        setDetailSubscription(subscription)
+        setDetailSubscriptionId(subscription.id)
         setIsDetailDialogOpen(true)
     }
 
@@ -105,7 +109,12 @@ export function SubPage() {
             <SubDetail
                 subscription={detailSubscription}
                 isOpen={isDetailDialogOpen}
-                onOpenChange={setIsDetailDialogOpen}
+                onOpenChange={(open) => {
+                    setIsDetailDialogOpen(open)
+                    if (!open) {
+                        setDetailSubscriptionId(null)
+                    }
+                }}
             />
 
             <SubLogDialog

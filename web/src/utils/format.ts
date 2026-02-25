@@ -60,3 +60,80 @@ export function formatLastRunTime(lastRun: string | undefined): string {
 export function formatBooleanText(value: boolean): string {
     return value ? '启用' : '禁用'
 }
+
+export function formatBytes(bytes: number): string {
+    if (!Number.isFinite(bytes) || bytes <= 0) return '0 B'
+
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    let value = bytes
+    let unitIndex = 0
+
+    while (value >= 1024 && unitIndex < units.length - 1) {
+        value /= 1024
+        unitIndex++
+    }
+
+    if (unitIndex === 0) {
+        return `${Math.round(value)} ${units[unitIndex]}`
+    }
+    return `${value.toFixed(2)} ${units[unitIndex]}`
+}
+
+export interface TrafficSummary {
+    usedBytes: number
+    usedText: string
+    totalText: string
+    isUnlimited: boolean
+    isOverLimit: boolean
+    usagePercent: number | null
+}
+
+export function formatTrafficSummary(upload: number, download: number, total: number): TrafficSummary {
+    const safeUpload = Number.isFinite(upload) ? upload : 0
+    const safeDownload = Number.isFinite(download) ? download : 0
+    const safeTotal = Number.isFinite(total) ? total : 0
+
+    const usedBytes = Math.max(0, safeUpload) + Math.max(0, safeDownload)
+    const isUnlimited = safeTotal === 0 || safeTotal === -1
+    const isOverLimit = safeTotal > 0 && usedBytes > safeTotal
+    const usagePercent = safeTotal > 0 ? (usedBytes / safeTotal) * 100 : null
+
+    return {
+        usedBytes,
+        usedText: formatBytes(usedBytes),
+        totalText: isUnlimited ? '无限流量' : formatBytes(Math.max(0, safeTotal)),
+        isUnlimited,
+        isOverLimit,
+        usagePercent,
+    }
+}
+
+export type ExpireState = 'permanent' | 'expired' | 'warning' | 'normal'
+
+export interface ExpireStatus {
+    label: string
+    state: ExpireState
+}
+
+export function formatExpireStatus(expire: number): ExpireStatus {
+    const safeExpire = Number.isFinite(expire) ? expire : 0
+    if (safeExpire === 0 || safeExpire >= 9999999999) {
+        return { label: '永久有效', state: 'permanent' }
+    }
+
+    const nowMs = Date.now()
+    const expireMs = safeExpire * 1000
+    if (expireMs <= nowMs) {
+        return { label: '已过期', state: 'expired' }
+    }
+
+    const warningThresholdMs = 7 * 24 * 60 * 60 * 1000
+    if (expireMs-nowMs <= warningThresholdMs) {
+        return { label: '即将到期', state: 'warning' }
+    }
+
+    return {
+        label: new Date(expireMs).toLocaleString('zh-CN'),
+        state: 'normal',
+    }
+}

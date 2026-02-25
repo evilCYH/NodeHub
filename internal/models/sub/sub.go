@@ -8,15 +8,20 @@ import (
 )
 
 type Data struct {
-	ID        uint16    `db:"id" json:"id"`
-	Enable    bool      `db:"enable" json:"enable"`
-	Name      string    `db:"name" json:"name"`
-	Tags      string    `db:"tags" json:"tags"`
-	CronExpr  string    `db:"cron_expr" json:"cron_expr"`
-	Config    string    `db:"config" json:"config"`
-	Result    string    `db:"result" json:"result"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+	ID            uint16     `db:"id" json:"id"`
+	Enable        bool       `db:"enable" json:"enable"`
+	Name          string     `db:"name" json:"name"`
+	Tags          string     `db:"tags" json:"tags"`
+	CronExpr      string     `db:"cron_expr" json:"cron_expr"`
+	Config        string     `db:"config" json:"config"`
+	Result        string     `db:"result" json:"result"`
+	Upload        int64      `db:"upload" json:"upload"`
+	Download      int64      `db:"download" json:"download"`
+	Total         int64      `db:"total" json:"total"`
+	Expire        int64      `db:"expire" json:"expire"`
+	InfoUpdatedAt *time.Time `db:"info_updated_at" json:"info_updated_at"`
+	CreatedAt     time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt     time.Time  `db:"updated_at" json:"updated_at"`
 }
 
 type Config struct {
@@ -53,17 +58,22 @@ type Request struct {
 }
 
 type Response struct {
-	ID        uint16               `json:"id" description:"订阅任务ID"`
-	Name      string               `json:"name" description:"订阅任务名称"`
-	Tags      []string             `json:"tags" description:"订阅标签"`
-	Enable    bool                 `json:"enable" description:"是否启用"`
-	CronExpr  string               `json:"cron_expr" description:"cron表达式"`
-	Config    Config               `json:"config" description:"订阅器配置"`
-	Status    string               `json:"status" description:"订阅状态"`
-	Result    Result               `json:"result" description:"订阅结果"`
-	Info      nodeModel.SimpleInfo `json:"info" description:"订阅信息"`
-	CreatedAt time.Time            `json:"created_at" description:"创建时间"`
-	UpdatedAt time.Time            `json:"updated_at" description:"更新时间"`
+	ID            uint16               `json:"id" description:"订阅任务ID"`
+	Name          string               `json:"name" description:"订阅任务名称"`
+	Tags          []string             `json:"tags" description:"订阅标签"`
+	Enable        bool                 `json:"enable" description:"是否启用"`
+	CronExpr      string               `json:"cron_expr" description:"cron表达式"`
+	Config        Config               `json:"config" description:"订阅器配置"`
+	Status        string               `json:"status" description:"订阅状态"`
+	Result        Result               `json:"result" description:"订阅结果"`
+	Info          nodeModel.SimpleInfo `json:"info" description:"订阅信息"`
+	Upload        int64                `json:"upload" description:"已上传流量(字节)"`
+	Download      int64                `json:"download" description:"已下载流量(字节)"`
+	Total         int64                `json:"total" description:"总流量(字节)"`
+	Expire        int64                `json:"expire" description:"到期时间(Unix秒)"`
+	InfoUpdatedAt *time.Time           `json:"info_updated_at" description:"流量信息更新时间"`
+	CreatedAt     time.Time            `json:"created_at" description:"创建时间"`
+	UpdatedAt     time.Time            `json:"updated_at" description:"更新时间"`
 }
 
 func (c *Request) GenData(id uint16) Data {
@@ -89,16 +99,21 @@ func (d *Data) GenResponse(status string, subInfo nodeModel.SimpleInfo) Response
 	tags := make([]string, 0)
 	json.Unmarshal([]byte(d.Tags), &tags)
 	return Response{
-		ID:        d.ID,
-		Name:      d.Name,
-		Tags:      tags,
-		Enable:    d.Enable,
-		CronExpr:  d.CronExpr,
-		Config:    config,
-		Status:    status,
-		Result:    result,
-		Info:      subInfo,
-		CreatedAt: d.CreatedAt,
-		UpdatedAt: d.UpdatedAt,
+		ID:            d.ID,
+		Name:          d.Name,
+		Tags:          tags,
+		Enable:        d.Enable,
+		CronExpr:      d.CronExpr,
+		Config:        config,
+		Status:        status,
+		Result:        result,
+		Info:          subInfo,
+		Upload:        d.Upload,
+		Download:      d.Download,
+		Total:         d.Total,
+		Expire:        d.Expire,
+		InfoUpdatedAt: d.InfoUpdatedAt,
+		CreatedAt:     d.CreatedAt,
+		UpdatedAt:     d.UpdatedAt,
 	}
 }

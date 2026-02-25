@@ -49,7 +49,7 @@ func FetchAdd(data *subModel.Data) error {
 
 
 func runFetch(subID uint16, config string) subModel.Result {
-	fetchCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	fetchCtx, cancel := context.WithTimeout(context.Background(), 35*time.Second)
 	fetchRunning.Store(subID, cancel)
 	defer func() {
 		cancel()

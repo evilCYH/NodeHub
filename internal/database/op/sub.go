@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/evilCYH/NodeHub/internal/database/interfaces"
 	"github.com/evilCYH/NodeHub/internal/models/setting"
@@ -105,6 +106,11 @@ func UpdateSub(ctx context.Context, sub *subModel.Data) error {
 	}
 	sub.Result = oldSub.Result
 	sub.CreatedAt = oldSub.CreatedAt
+	sub.Upload = oldSub.Upload
+	sub.Download = oldSub.Download
+	sub.Total = oldSub.Total
+	sub.Expire = oldSub.Expire
+	sub.InfoUpdatedAt = oldSub.InfoUpdatedAt
 	if err := SubRepo().Update(ctx, sub); err != nil {
 		return err
 	}
@@ -158,6 +164,28 @@ func DeleteSub(ctx context.Context, id uint16) error {
 		return err
 	}
 	subCache.Del(id)
+	return nil
+}
+
+func UpdateSubInfo(ctx context.Context, id uint16, upload, download, total, expire int64, infoUpdatedAt *time.Time) error {
+	if subCache.Len() == 0 {
+		if err := refreshSubCache(ctx); err != nil {
+			return err
+		}
+	}
+	sub, ok := subCache.Get(id)
+	if !ok {
+		return fmt.Errorf("sub not found")
+	}
+	if err := SubRepo().UpdateSubInfo(ctx, id, upload, download, total, expire, infoUpdatedAt); err != nil {
+		return err
+	}
+	sub.Upload = upload
+	sub.Download = download
+	sub.Total = total
+	sub.Expire = expire
+	sub.InfoUpdatedAt = infoUpdatedAt
+	subCache.Set(id, sub)
 	return nil
 }
 func refreshSubCache(ctx context.Context) error {

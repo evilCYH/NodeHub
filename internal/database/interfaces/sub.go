@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"time"
 
 	"github.com/evilCYH/NodeHub/internal/models/sub"
 )
@@ -25,4 +26,7 @@ type SubRepository interface {
 
 	// BatchCreate 批量创建订阅链接
 	BatchCreate(ctx context.Context, links []*sub.Data) error
+
+	// UpdateSubInfo 更新订阅流量与到期信息
+	UpdateSubInfo(ctx context.Context, id uint16, upload, download, total, expire int64, infoUpdatedAt *time.Time) error
 }
