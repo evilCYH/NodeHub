@@ -4,64 +4,99 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/evilCYH/NodeHub/internal/models/config"
 	"github.com/evilCYH/NodeHub/internal/utils"
 )
 
-var baseConfig = config.DefaultBase()
+var (
+	baseConfig = config.DefaultBase()
+	configMu   sync.RWMutex
+	loaded     bool
+)
 
-func init() {
+func defaultConfigPath() (string, error) {
 	execPath, err := os.Executable()
 	if err != nil {
-		panic(fmt.Errorf("获取可执行文件路径失败: %v", err))
+		return "", fmt.Errorf("获取可执行文件路径失败: %v", err)
 	}
 	execDir := filepath.Dir(execPath)
-	defaultConfigPath := filepath.Join(execDir, "config.json")
+	return filepath.Join(execDir, "config.json"), nil
+}
 
-	configPath := flag.String("c", defaultConfigPath, "config file path")
-	flag.Parse()
-	if *configPath == "" {
-		*configPath = defaultConfigPath
-	}
-	if !filepath.IsAbs(*configPath) {
-		absPath, err := filepath.Abs(*configPath)
+func resolveConfigPath(configPath string) (string, error) {
+	if configPath == "" {
+		defaultPath, err := defaultConfigPath()
 		if err != nil {
-			panic(fmt.Errorf("无法转换为绝对路径: %v", err))
+			return "", err
 		}
-		*configPath = absPath
+		configPath = defaultPath
+	}
+	if !filepath.IsAbs(configPath) {
+		absPath, err := filepath.Abs(configPath)
+		if err != nil {
+			return "", fmt.Errorf("无法转换为绝对路径: %v", err)
+		}
+		configPath = absPath
+	}
+	return configPath, nil
+}
+
+func Load(configPath string) error {
+	resolvedPath, err := resolveConfigPath(configPath)
+	if err != nil {
+		return err
 	}
 
-	if err := loadFromFile(&baseConfig, *configPath); err != nil {
+	cfg := config.DefaultBase()
+	if err := loadFromFile(&cfg, resolvedPath); err != nil {
 		if os.IsNotExist(err) {
-			if err := createDefaultConfig(*configPath); err != nil {
-				panic(fmt.Errorf("创建默认配置文件失败: %v", err))
+			if err := createDefaultConfig(resolvedPath, &cfg); err != nil {
+				return fmt.Errorf("创建默认配置文件失败: %v", err)
 			}
-			if err := loadFromFile(&baseConfig, *configPath); err != nil {
-				panic(fmt.Errorf("加载默认配置文件失败: %v", err))
+			if err := loadFromFile(&cfg, resolvedPath); err != nil {
+				return fmt.Errorf("加载默认配置文件失败: %v", err)
 			}
 		} else {
-			panic(fmt.Errorf("加载配置文件失败: %v", err))
+			return fmt.Errorf("加载配置文件失败: %v", err)
 		}
 	}
 
-	setupPaths(&baseConfig, *configPath)
+	setupPaths(&cfg, resolvedPath)
 
-	loadFromEnv(&baseConfig)
+	loadFromEnv(&cfg)
 
-	if err := validateConfig(&baseConfig); err != nil {
-		panic(fmt.Errorf("配置验证失败: %v", err))
+	if err := validateConfig(&cfg); err != nil {
+		return fmt.Errorf("配置验证失败: %v", err)
+	}
+
+	configMu.Lock()
+	baseConfig = cfg
+	loaded = true
+	configMu.Unlock()
+
+	return nil
+}
+
+func MustLoad(configPath string) {
+	if err := Load(configPath); err != nil {
+		panic(err)
 	}
 }
 
 func Base() config.Base {
+	configMu.RLock()
+	defer configMu.RUnlock()
+	if !loaded {
+		panic("config not loaded: call config.Load or config.MustLoad first")
+	}
 	return baseConfig
 }
 
@@ -141,17 +176,19 @@ func parsePort(portStr string) (int, error) {
 	return port, nil
 }
 
-func createDefaultConfig(filePath string) error {
+func createDefaultConfig(filePath string, cfg *config.Base) error {
 	dir := filepath.Dir(filePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("创建配置目录失败: %v", err)
 	}
 
 	bytes := make([]byte, 32)
-	rand.Read(bytes)
-	baseConfig.JWT.Secret = hex.EncodeToString(bytes)
+	if _, err := rand.Read(bytes); err != nil {
+		return fmt.Errorf("生成JWT密钥失败: %v", err)
+	}
+	cfg.JWT.Secret = hex.EncodeToString(bytes)
 
-	data, err := json.MarshalIndent(baseConfig, "", "    ")
+	data, err := json.MarshalIndent(cfg, "", "    ")
 	if err != nil {
 		return fmt.Errorf("序列化默认配置失败: %v", err)
 	}

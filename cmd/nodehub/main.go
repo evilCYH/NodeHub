@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/evilCYH/NodeHub/internal/config"
 	"github.com/evilCYH/NodeHub/internal/core/cron"
 	"github.com/evilCYH/NodeHub/internal/core/node"
@@ -15,6 +17,9 @@ import (
 )
 
 func main() {
+	configPath := flag.String("c", "", "config file path")
+	flag.Parse()
+	config.MustLoad(*configPath)
 
 	info.Banner()
 
