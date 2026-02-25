@@ -115,6 +115,12 @@ export interface ExpireStatus {
     state: ExpireState
 }
 
+export function hasSubscriptionInfo(infoUpdatedAt?: string | null): boolean {
+    if (!infoUpdatedAt) return false
+    const time = new Date(infoUpdatedAt).getTime()
+    return Number.isFinite(time)
+}
+
 export function formatExpireStatus(expire: number): ExpireStatus {
     const safeExpire = Number.isFinite(expire) ? expire : 0
     if (safeExpire === 0 || safeExpire >= 9999999999) {

@@ -5,7 +5,7 @@ import { InlineLoading } from "@/src/components/ui/loading"
 import { Switch } from "@/src/components/ui/switch"
 import { RefreshCw, Edit, Trash2, FileText } from "lucide-react"
 import { toast } from "sonner"
-import { formatExpireStatus, formatLastRunTime, formatTrafficSummary } from "@/src/utils"
+import { formatExpireStatus, formatLastRunTime, formatTrafficSummary, hasSubscriptionInfo } from "@/src/utils"
 import { StatusBadge } from "@/src/components/shared/status-badge"
 import { formatSpeed } from "../utils"
 import { useSubs, useDeleteSub, useRefreshSub, useUpdateSub } from "@/src/lib/queries/sub-queries"
@@ -158,6 +158,7 @@ export function SubList({
                                     <div>最后运行: <span className="text-muted-foreground">{formatLastRunTime(sub.result?.last_run)}</span></div>
                                     <div>执行时长: <span className="text-muted-foreground">{sub.result?.duration || 0}ms</span></div>
                                     {(() => {
+                                        const hasInfo = hasSubscriptionInfo(sub.info_updated_at)
                                         const traffic = formatTrafficSummary(sub.upload, sub.download, sub.total)
                                         const expire = formatExpireStatus(sub.expire)
                                         const trafficClass = traffic.isOverLimit ? 'text-red-600' : 'text-green-600'
@@ -170,13 +171,22 @@ export function SubList({
                                                     : 'text-muted-foreground'
                                         return (
                                             <>
-                                                <div>流量:
-                                                    <span className={`ml-1 ${trafficClass}`}>
-                                                        {traffic.usedText} / {traffic.totalText}
-                                                    </span>
-                                                    {traffic.isOverLimit ? <span className="ml-1 text-red-600">已超限</span> : null}
-                                                </div>
-                                                <div>到期: <span className={expireClass}>{expire.label}</span></div>
+                                                {!hasInfo ? (
+                                                    <>
+                                                        <div>流量: <span className="text-muted-foreground">未知</span></div>
+                                                        <div>到期: <span className="text-muted-foreground">未知</span></div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div>流量:
+                                                            <span className={`ml-1 ${trafficClass}`}>
+                                                                {traffic.usedText} / {traffic.totalText}
+                                                            </span>
+                                                            {traffic.isOverLimit ? <span className="ml-1 text-red-600">已超限</span> : null}
+                                                        </div>
+                                                        <div>到期: <span className={expireClass}>{expire.label}</span></div>
+                                                    </>
+                                                )}
                                             </>
                                         )
                                     })()}

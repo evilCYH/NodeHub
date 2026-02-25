@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog"
-import { formatTime, formatLastRunTime, getNextCronRunTime, formatDuration, formatBytes, formatExpireStatus, formatTrafficSummary } from "@/src/utils"
+import { formatTime, formatLastRunTime, getNextCronRunTime, formatDuration, formatBytes, formatExpireStatus, formatTrafficSummary, hasSubscriptionInfo } from "@/src/utils"
 import { useNodeUpdateLog } from "@/src/lib/queries/node-log-queries"
 import StatusBadge from "@/src/components/shared/status-badge"
 import type { SubResponse } from "@/src/types/sub"
@@ -28,6 +28,7 @@ export function SubDetail({
     }
     const traffic = formatTrafficSummary(subscription.upload, subscription.download, subscription.total)
     const expire = formatExpireStatus(subscription.expire)
+    const hasInfo = hasSubscriptionInfo(subscription.info_updated_at)
     const expireClass = expire.state === 'expired'
         ? 'text-red-600'
         : expire.state === 'warning'
@@ -115,24 +116,43 @@ export function SubDetail({
                         <h3 className="font-semibold mb-2">流量与到期</h3>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div className="space-y-2">
-                                <div className="text-muted-foreground"><span>上传流量:</span> {formatBytes(subscription.upload)}</div>
-                                <div className="text-muted-foreground"><span>下载流量:</span> {formatBytes(subscription.download)}</div>
-                                <div className="text-muted-foreground">
-                                    <span>已用流量:</span>
-                                    <span className={`ml-1 ${traffic.isOverLimit ? 'text-red-600' : 'text-green-600'}`}>
-                                        {traffic.usedText}
-                                    </span>
-                                </div>
+                                {!hasInfo ? (
+                                    <>
+                                        <div className="text-muted-foreground"><span>上传流量:</span> 未知</div>
+                                        <div className="text-muted-foreground"><span>下载流量:</span> 未知</div>
+                                        <div className="text-muted-foreground"><span>已用流量:</span> 未知</div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-muted-foreground"><span>上传流量:</span> {formatBytes(subscription.upload)}</div>
+                                        <div className="text-muted-foreground"><span>下载流量:</span> {formatBytes(subscription.download)}</div>
+                                        <div className="text-muted-foreground">
+                                            <span>已用流量:</span>
+                                            <span className={`ml-1 ${traffic.isOverLimit ? 'text-red-600' : 'text-green-600'}`}>
+                                                {traffic.usedText}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                             <div className="space-y-2">
-                                <div className="text-muted-foreground"><span>总流量:</span> {traffic.totalText}</div>
-                                <div className="text-muted-foreground">
-                                    <span>到期状态:</span>
-                                    <span className={`ml-1 ${expireClass}`}>{expire.label}</span>
-                                </div>
-                                {traffic.isOverLimit ? (
-                                    <div className="text-red-600">已超限</div>
-                                ) : null}
+                                {!hasInfo ? (
+                                    <>
+                                        <div className="text-muted-foreground"><span>总流量:</span> 未知</div>
+                                        <div className="text-muted-foreground"><span>到期状态:</span> 未知</div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-muted-foreground"><span>总流量:</span> {traffic.totalText}</div>
+                                        <div className="text-muted-foreground">
+                                            <span>到期状态:</span>
+                                            <span className={`ml-1 ${expireClass}`}>{expire.label}</span>
+                                        </div>
+                                        {traffic.isOverLimit ? (
+                                            <div className="text-red-600">已超限</div>
+                                        ) : null}
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
