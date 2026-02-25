@@ -96,12 +96,19 @@ func (e *TikTok) Run(ctx context.Context, log *log.Logger, subID []uint16) check
 			switch result {
 			case 1:
 				n.Info.SetAliveStatus(nodeModel.TikTok, true)
+				n.Info.SetAliveStatus(nodeModel.TikTokIDC, false)
 			case 2:
+				n.Info.SetAliveStatus(nodeModel.TikTok, false)
 				n.Info.SetAliveStatus(nodeModel.TikTokIDC, true)
 			default:
 				n.Info.SetAliveStatus(nodeModel.TikTok, false)
 				n.Info.SetAliveStatus(nodeModel.TikTokIDC, false)
 			}
+			node.UpdateNodeTikTokInPool(
+				n.Base.UniqueKey,
+				n.Info.AliveStatus&nodeModel.TikTok != 0,
+				n.Info.AliveStatus&nodeModel.TikTokIDC != 0,
+			)
 			node.UpdateRegistryTikTok(n.Base.SubId, n.Base.UniqueKey, n.Info.AliveStatus, "tiktok_task")
 			message := "tiktok: unavailable"
 			if result == 1 {

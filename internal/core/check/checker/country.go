@@ -113,6 +113,7 @@ func (e *Country) Run(ctx context.Context, log *log.Logger, subID []uint16) chec
 			} else {
 				n.Info.SetAliveStatus(nodeModel.Country, false)
 			}
+			node.UpdateNodeCountryInPool(n.Base.UniqueKey, n.Info.Country, countryCode != "")
 			node.UpdateRegistryCountry(n.Base.SubId, n.Base.UniqueKey, n.Info.Country, countryCode != "", "country_task")
 			if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
 				SubID:     n.Base.SubId,

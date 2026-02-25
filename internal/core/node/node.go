@@ -768,6 +768,93 @@ func cloneQueue[T generic.Integer](q generic.Queue[T]) generic.Queue[T] {
 	}
 }
 
+func ensureInfoQueues(info *nodeModel.Info) {
+	if info == nil {
+		return
+	}
+	if info.Delay.Data == nil {
+		info.Delay = *generic.NewQueue[uint16](5)
+	}
+	if info.SpeedUp.Data == nil {
+		info.SpeedUp = *generic.NewQueue[uint32](5)
+	}
+	if info.SpeedDown.Data == nil {
+		info.SpeedDown = *generic.NewQueue[uint32](5)
+	}
+}
+
+// UpdateNodeAliveInPool 按字段更新池中节点的存活状态和延迟
+func UpdateNodeAliveInPool(uniqueKey uint64, alive bool, delay uint16) bool {
+	poolMutex.Lock()
+	defer poolMutex.Unlock()
+
+	for i := range pool {
+		if pool[i].Base.UniqueKey != uniqueKey || pool[i].Info == nil {
+			continue
+		}
+		ensureInfoQueues(pool[i].Info)
+		pool[i].Info.SetAliveStatus(nodeModel.Alive, alive)
+		if alive && delay > 0 {
+			pool[i].Info.Delay.Update(delay)
+		}
+		return true
+	}
+	return false
+}
+
+// UpdateNodeCountryInPool 按字段更新池中节点的国家信息
+func UpdateNodeCountryInPool(uniqueKey uint64, country string, ok bool) bool {
+	poolMutex.Lock()
+	defer poolMutex.Unlock()
+
+	for i := range pool {
+		if pool[i].Base.UniqueKey != uniqueKey || pool[i].Info == nil {
+			continue
+		}
+		pool[i].Info.Country = country
+		pool[i].Info.SetAliveStatus(nodeModel.Country, ok)
+		return true
+	}
+	return false
+}
+
+// UpdateNodeSpeedInPool 按字段更新池中节点的上下行速度
+func UpdateNodeSpeedInPool(uniqueKey uint64, up uint32, down uint32) bool {
+	poolMutex.Lock()
+	defer poolMutex.Unlock()
+
+	for i := range pool {
+		if pool[i].Base.UniqueKey != uniqueKey || pool[i].Info == nil {
+			continue
+		}
+		ensureInfoQueues(pool[i].Info)
+		if up > 0 {
+			pool[i].Info.SpeedUp.Update(up)
+		}
+		if down > 0 {
+			pool[i].Info.SpeedDown.Update(down)
+		}
+		return true
+	}
+	return false
+}
+
+// UpdateNodeTikTokInPool 按字段更新池中节点的 TikTok 状态位
+func UpdateNodeTikTokInPool(uniqueKey uint64, tiktok bool, tiktokIDC bool) bool {
+	poolMutex.Lock()
+	defer poolMutex.Unlock()
+
+	for i := range pool {
+		if pool[i].Base.UniqueKey != uniqueKey || pool[i].Info == nil {
+			continue
+		}
+		pool[i].Info.SetAliveStatus(nodeModel.TikTok, tiktok)
+		pool[i].Info.SetAliveStatus(nodeModel.TikTokIDC, tiktokIDC)
+		return true
+	}
+	return false
+}
+
 // UpdateNodeInPool 更新池中节点的状态
 // 如果节点存在，更新其 Info；如果不存在，返回 false
 // 如果测试失败（info 为 nil），从池中移除节点

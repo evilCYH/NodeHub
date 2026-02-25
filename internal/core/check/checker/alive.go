@@ -102,7 +102,7 @@ func (e *Alive) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 				n.Info.SetAliveStatus(nodeModel.Alive, true)
 				n.Info.Delay.Update(delay)
 				atomic.AddInt64(&totalDelay, int64(n.Info.Delay.Average()))
-				node.UpdateNodeInPool(n.Base.UniqueKey, n.Info)
+				node.UpdateNodeAliveInPool(n.Base.UniqueKey, true, delay)
 				node.UpdateRegistryAlive(n.Base.SubId, n.Base.UniqueKey, true, delay, "alive_task")
 				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
 					SubID:     n.Base.SubId,
@@ -119,7 +119,7 @@ func (e *Alive) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 			} else {
 				atomic.AddInt64(&deadCount, 1)
 				n.Info.SetAliveStatus(nodeModel.Alive, false)
-				node.UpdateNodeInPool(n.Base.UniqueKey, n.Info)
+				node.UpdateNodeAliveInPool(n.Base.UniqueKey, false, 0)
 				node.UpdateRegistryAlive(n.Base.SubId, n.Base.UniqueKey, false, 0, "alive_task")
 				if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
 					SubID:     n.Base.SubId,

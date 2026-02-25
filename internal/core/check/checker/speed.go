@@ -127,6 +127,7 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 				speed := e.download(ctx, client.Client)
 				if speed > 0 {
 					n.Info.SpeedDown.Update(uint32(speed))
+					node.UpdateNodeSpeedInPool(n.Base.UniqueKey, 0, uint32(speed))
 					node.UpdateRegistrySpeed(n.Base.SubId, n.Base.UniqueKey, 0, uint32(speed), "speed_task")
 					if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
 						SubID:     n.Base.SubId,
@@ -150,6 +151,7 @@ func (e *Speed) Run(ctx context.Context, log *log.Logger, subID []uint16) checkM
 				speed := e.upload(ctx, client.Client)
 				if speed > 0 {
 					n.Info.SpeedUp.Update(uint32(speed))
+					node.UpdateNodeSpeedInPool(n.Base.UniqueKey, uint32(speed), 0)
 					node.UpdateRegistrySpeed(n.Base.SubId, n.Base.UniqueKey, uint32(speed), 0, "speed_task")
 					if err := op.CreateNodeLog(ctx, &nodeModel.NodeLog{
 						SubID:     n.Base.SubId,
