@@ -1,6 +1,6 @@
 import { API_PATH } from '../config/config'
 import { tokenManager } from './token-manager'
-import type { LoginResponse, UserInfo, ApiResponse, SubResponse, CheckResponse, CheckRequest, SubRequest, DynamicConfigItem, SubNameAndID, NotifyResponse, NotifyRequest, NotifyTemplate, NotifyChannel, NotifyChannelConfigResponse, ShareResponse, ShareRequest, Setting, ChangePasswordRequest, UpdateUserInfoRequest, UpdateResponse, UpdateComponent, SystemVersion, NodeResponse, NodeDetailResponse, NodeUpdateLogResponse, NodeTestLogResponse, SubRunLogResponse, NodeLogResponse } from '@/src/types'
+import type { LoginResponse, UserInfo, ApiResponse, SubResponse, CheckResponse, CheckRequest, SubRequest, DynamicConfigItem, SubNameAndID, NotifyResponse, NotifyRequest, NotifyTemplate, NotifyChannel, NotifyChannelConfigResponse, ShareResponse, ShareRequest, Setting, ChangePasswordRequest, UpdateUserInfoRequest, UpdateResponse, UpdateComponent, SystemVersion, NodeResponse, NodeDetailResponse, NodeUpdateLogResponse, NodeTestLogResponse, SubRunLogResponse, NodeLogResponse, SubOrderItem } from '@/src/types'
 
 const DEFAULT_REQUEST_HEADERS: Record<string, string> = {}
 
@@ -152,6 +152,9 @@ export const api = {
   async updateSubscription(id: number, data: SubRequest): Promise<SubResponse> {
     const response = await apiClient.put<ApiResponse<SubResponse>>(`${API_PATH.sub}/${id}`, data)
     return response.data
+  },
+  async updateSubOrder(orders: SubOrderItem[]): Promise<void> {
+    await apiClient.put<ApiResponse<void>>(`${API_PATH.sub}/order`, { orders })
   },
   async deleteSubscription(id: number): Promise<void> {
     await apiClient.delete<ApiResponse<void>>(`${API_PATH.sub}/${id}`)

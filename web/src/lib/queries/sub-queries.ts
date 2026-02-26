@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/src/lib/api/client'
-import type { SubResponse, SubRequest } from '@/src/types'
+import type { SubResponse, SubRequest, SubOrderItem } from '@/src/types'
 
 const subKeys = {
     all: ['subs'] as const,
@@ -159,3 +159,39 @@ export function useBatchCreateSub() {
         },
     })
 } 
+
+export function useUpdateSubOrder() {
+    const queryClient = useQueryClient()
+
+    return useMutation({
+        mutationFn: (orders: SubOrderItem[]) => api.updateSubOrder(orders),
+        onMutate: async (orders) => {
+            await queryClient.cancelQueries({ queryKey: subKeys.lists() })
+            const previousSubs = queryClient.getQueryData<SubResponse[]>(subKeys.lists())
+
+            if (previousSubs) {
+                const orderMap = new Map<number, number>(orders.map(item => [item.id, item.sort_order]))
+                const sortedSubs = previousSubs.slice().sort((a, b) => {
+                    const orderA = orderMap.get(a.id) ?? Number.MAX_SAFE_INTEGER
+                    const orderB = orderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER
+                    if (orderA === orderB) return a.id - b.id
+                    return orderA - orderB
+                })
+                queryClient.setQueryData(subKeys.lists(), sortedSubs)
+            }
+
+            return { previousSubs }
+        },
+        onError: (_error, _orders, context) => {
+            if (context?.previousSubs) {
+                queryClient.setQueryData(subKeys.lists(), context.previousSubs)
+            }
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({
+                queryKey: subKeys.lists(),
+                refetchType: 'active'
+            })
+        },
+    })
+}

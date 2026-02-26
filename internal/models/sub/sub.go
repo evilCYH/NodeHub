@@ -9,6 +9,7 @@ import (
 
 type Data struct {
 	ID            uint16     `db:"id" json:"id"`
+	SortOrder     int        `db:"sort_order" json:"sort_order"`
 	Enable        bool       `db:"enable" json:"enable"`
 	Name          string     `db:"name" json:"name"`
 	Tags          string     `db:"tags" json:"tags"`
@@ -47,6 +48,15 @@ type Result struct {
 type NameAndID struct {
 	ID   uint16 `json:"id"`
 	Name string `json:"name"`
+}
+
+type SortOrderItem struct {
+	ID        uint16 `json:"id" binding:"required"`
+	SortOrder int    `json:"sort_order" binding:"required"`
+}
+
+type UpdateOrderRequest struct {
+	Orders []SortOrderItem `json:"orders" binding:"required"`
 }
 
 type Request struct {

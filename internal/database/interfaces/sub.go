@@ -27,6 +27,9 @@ type SubRepository interface {
 	// BatchCreate 批量创建订阅链接
 	BatchCreate(ctx context.Context, links []*sub.Data) error
 
+	// UpdateSortOrder 批量更新订阅排序
+	UpdateSortOrder(ctx context.Context, orders []sub.SortOrderItem) error
+
 	// UpdateSubInfo 更新订阅流量与到期信息
 	UpdateSubInfo(ctx context.Context, id uint16, upload, download, total, expire int64, infoUpdatedAt *time.Time) error
 }

@@ -3,7 +3,9 @@ package op
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/evilCYH/NodeHub/internal/database/interfaces"
@@ -14,6 +16,23 @@ import (
 
 var subRepo interfaces.SubRepository
 var subCache = cache.New[uint16, subModel.Data](16)
+
+type subOrderValidationError struct {
+	msg string
+}
+
+func (e *subOrderValidationError) Error() string {
+	return e.msg
+}
+
+func newSubOrderValidationError(msg string) error {
+	return &subOrderValidationError{msg: msg}
+}
+
+func IsSubOrderValidationError(err error) bool {
+	var target *subOrderValidationError
+	return errors.As(err, &target)
+}
 
 func SubRepo() interfaces.SubRepository {
 	if subRepo == nil {
@@ -34,6 +53,12 @@ func GetSubList(ctx context.Context) ([]subModel.Data, error) {
 	for _, v := range subList {
 		result = append(result, v)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].SortOrder == result[j].SortOrder {
+			return result[i].ID < result[j].ID
+		}
+		return result[i].SortOrder < result[j].SortOrder
+	})
 	return result, nil
 }
 
@@ -105,6 +130,7 @@ func UpdateSub(ctx context.Context, sub *subModel.Data) error {
 		return fmt.Errorf("sub not found")
 	}
 	sub.Result = oldSub.Result
+	sub.SortOrder = oldSub.SortOrder
 	sub.CreatedAt = oldSub.CreatedAt
 	sub.Upload = oldSub.Upload
 	sub.Download = oldSub.Download
@@ -188,6 +214,58 @@ func UpdateSubInfo(ctx context.Context, id uint16, upload, download, total, expi
 	subCache.Set(id, sub)
 	return nil
 }
+
+func UpdateSubOrder(ctx context.Context, orders []subModel.SortOrderItem) error {
+	if len(orders) == 0 {
+		return newSubOrderValidationError("orders is empty")
+	}
+	if subCache.Len() == 0 {
+		if err := refreshSubCache(ctx); err != nil {
+			return err
+		}
+	}
+
+	subMap := subCache.GetAll()
+	if len(orders) != len(subMap) {
+		return newSubOrderValidationError("orders must include all subscriptions")
+	}
+
+	seenIDs := make(map[uint16]struct{}, len(orders))
+	seenSortOrders := make([]bool, len(orders))
+	for _, item := range orders {
+		if _, ok := subMap[item.ID]; !ok {
+			return newSubOrderValidationError(fmt.Sprintf("subscription not found: %d", item.ID))
+		}
+		if _, duplicated := seenIDs[item.ID]; duplicated {
+			return newSubOrderValidationError(fmt.Sprintf("duplicate subscription id: %d", item.ID))
+		}
+		seenIDs[item.ID] = struct{}{}
+
+		if item.SortOrder < 0 || item.SortOrder >= len(orders) {
+			return newSubOrderValidationError(fmt.Sprintf("invalid sort_order: %d", item.SortOrder))
+		}
+		if seenSortOrders[item.SortOrder] {
+			return newSubOrderValidationError(fmt.Sprintf("duplicate sort_order: %d", item.SortOrder))
+		}
+		seenSortOrders[item.SortOrder] = true
+	}
+	for index, exists := range seenSortOrders {
+		if !exists {
+			return newSubOrderValidationError(fmt.Sprintf("missing sort_order: %d", index))
+		}
+	}
+
+	if err := SubRepo().UpdateSortOrder(ctx, orders); err != nil {
+		return err
+	}
+	for _, item := range orders {
+		cachedSub := subMap[item.ID]
+		cachedSub.SortOrder = item.SortOrder
+		subCache.Set(item.ID, cachedSub)
+	}
+	return nil
+}
+
 func refreshSubCache(ctx context.Context) error {
 	subList, err := SubRepo().List(ctx)
 	if err != nil {

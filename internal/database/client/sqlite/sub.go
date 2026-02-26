@@ -33,11 +33,22 @@ func (db *DB) NodeUpdateLog() interfaces.NodeUpdateLogRepository {
 
 func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 	log.Debugf("Create sub")
-	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, upload, download, total, expire, info_updated_at, created_at, updated_at)
-	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	tx, err := r.db.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
 
 	now := time.Now()
-	result, err := r.db.db.ExecContext(ctx, query,
+	var nextSortOrder int
+	if err := tx.QueryRowContext(ctx, `SELECT COALESCE(MAX(sort_order) + 1, 0) FROM sub`).Scan(&nextSortOrder); err != nil {
+		return fmt.Errorf("failed to query next sort_order: %w", err)
+	}
+
+	query := `INSERT INTO sub (sort_order, enable, name, tags, cron_expr, config, upload, download, total, expire, info_updated_at, created_at, updated_at)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	result, err := tx.ExecContext(ctx, query,
+		nextSortOrder,
 		link.Enable,
 		link.Name,
 		link.Tags,
@@ -51,7 +62,6 @@ func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 		now,
 		now,
 	)
-
 	if err != nil {
 		return fmt.Errorf("failed to create sub: %w", err)
 	}
@@ -61,7 +71,12 @@ func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 		return fmt.Errorf("failed to get sub id: %w", err)
 	}
 
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit create sub transaction: %w", err)
+	}
+
 	link.ID = uint16(id)
+	link.SortOrder = nextSortOrder
 	link.CreatedAt = now
 	link.UpdatedAt = now
 
@@ -70,12 +85,13 @@ func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 
 func (r *SubRepository) GetByID(ctx context.Context, id uint16) (*sub.Data, error) {
 	log.Debugf("Get sub by id")
-	query := `SELECT id, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
+	query := `SELECT id, sort_order, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
 	          FROM sub WHERE id = ?`
 
 	var s sub.Data
 	err := r.db.db.QueryRowContext(ctx, query, id).Scan(
 		&s.ID,
+		&s.SortOrder,
 		&s.Enable,
 		&s.Name,
 		&s.Tags,
@@ -142,8 +158,8 @@ func (r *SubRepository) Delete(ctx context.Context, id uint16) error {
 
 func (r *SubRepository) List(ctx context.Context) (*[]sub.Data, error) {
 	log.Debugf("List sub")
-	query := `SELECT id, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
-	          FROM sub ORDER BY id DESC`
+	query := `SELECT id, sort_order, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
+	          FROM sub ORDER BY sort_order ASC, id ASC`
 
 	rows, err := r.db.db.QueryContext(ctx, query)
 	if err != nil {
@@ -156,6 +172,7 @@ func (r *SubRepository) List(ctx context.Context) (*[]sub.Data, error) {
 		var s sub.Data
 		err := rows.Scan(
 			&s.ID,
+			&s.SortOrder,
 			&s.Enable,
 			&s.Name,
 			&s.Tags,
@@ -200,18 +217,25 @@ func (r *SubRepository) BatchCreate(ctx context.Context, links []*sub.Data) erro
 		}
 	}()
 
-	query := `INSERT INTO sub (enable, name, tags, cron_expr, config, upload, download, total, expire, info_updated_at, created_at, updated_at)
-	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-
 	now := time.Now()
+	var nextSortOrder int
+	if err := tx.QueryRowContext(ctx, `SELECT COALESCE(MAX(sort_order) + 1, 0) FROM sub`).Scan(&nextSortOrder); err != nil {
+		return fmt.Errorf("failed to query next sort_order: %w", err)
+	}
+
+	query := `INSERT INTO sub (sort_order, enable, name, tags, cron_expr, config, upload, download, total, expire, info_updated_at, created_at, updated_at)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %w", err)
 	}
 	defer stmt.Close()
 
-	for _, link := range links {
+	for i, link := range links {
+		sortOrder := nextSortOrder + i
 		result, err := stmt.ExecContext(ctx,
+			sortOrder,
 			link.Enable,
 			link.Name,
 			link.Tags,
@@ -235,6 +259,7 @@ func (r *SubRepository) BatchCreate(ctx context.Context, links []*sub.Data) erro
 		}
 
 		link.ID = uint16(id)
+		link.SortOrder = sortOrder
 		link.CreatedAt = now
 		link.UpdatedAt = now
 	}
@@ -243,6 +268,45 @@ func (r *SubRepository) BatchCreate(ctx context.Context, links []*sub.Data) erro
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
+	return nil
+}
+
+func (r *SubRepository) UpdateSortOrder(ctx context.Context, orders []sub.SortOrderItem) error {
+	log.Debugf("Update sub sort order, count=%d", len(orders))
+	if len(orders) == 0 {
+		return nil
+	}
+
+	tx, err := r.db.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	now := time.Now()
+	stmt, err := tx.PrepareContext(ctx, `UPDATE sub SET sort_order = ?, updated_at = ? WHERE id = ?`)
+	if err != nil {
+		return fmt.Errorf("failed to prepare update sort_order statement: %w", err)
+	}
+	defer stmt.Close()
+
+	for _, order := range orders {
+		result, err := stmt.ExecContext(ctx, order.SortOrder, now, order.ID)
+		if err != nil {
+			return fmt.Errorf("failed to update sort_order for sub %d: %w", order.ID, err)
+		}
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			return fmt.Errorf("failed to check affected rows for sub %d: %w", order.ID, err)
+		}
+		if rowsAffected == 0 {
+			return fmt.Errorf("sub not found: %d", order.ID)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit update sort_order transaction: %w", err)
+	}
 	return nil
 }
 

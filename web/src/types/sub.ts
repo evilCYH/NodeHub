@@ -85,3 +85,8 @@ export interface SubNameAndID {
     id: number
     name: string
 }
+
+export interface SubOrderItem {
+    id: number
+    sort_order: number
+}

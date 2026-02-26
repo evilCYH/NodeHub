@@ -65,6 +65,10 @@ func init() {
 				Handle(getSubNameAndID),
 		).
 		AddRoute(
+			router.NewRoute("/order", router.PUT).
+				Handle(updateSubOrder),
+		).
+		AddRoute(
 			router.NewRoute("/:id", router.PUT).
 				Handle(updateSub),
 		).
@@ -203,6 +207,41 @@ func getSubs(c *gin.Context) {
 		respSub[0] = subData.GenResponse(cron.FetchStatus(subData.ID, subData.Enable), node.GetSubInfo(subData.ID))
 		resp.Success(c, respSub)
 	}
+}
+
+// updateSubOrder 批量更新订阅排序
+// @Summary 批量更新订阅排序
+// @Tags 订阅
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body sub.UpdateOrderRequest true "订阅排序更新请求（全量）"
+// @Success 200 {object} resp.ResponseStruct "更新成功"
+// @Failure 400 {object} resp.ResponseStruct "请求参数错误"
+// @Failure 401 {object} resp.ResponseStruct "未授权"
+// @Failure 500 {object} resp.ResponseStruct "服务器内部错误"
+// @Router /api/v1/sub/order [put]
+func updateSubOrder(c *gin.Context) {
+	var req sub.UpdateOrderRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		resp.ErrorBadRequest(c)
+		return
+	}
+	if len(req.Orders) == 0 {
+		resp.Error(c, http.StatusBadRequest, "orders is required")
+		return
+	}
+
+	if err := op.UpdateSubOrder(c.Request.Context(), req.Orders); err != nil {
+		if op.IsSubOrderValidationError(err) {
+			resp.Error(c, http.StatusBadRequest, err.Error())
+			return
+		}
+		log.Errorf("failed to update sub order: %v", err)
+		resp.Error(c, http.StatusInternalServerError, "failed to update sub order")
+		return
+	}
+	resp.Success(c, nil)
 }
 
 // updateSub 更新订阅链接
