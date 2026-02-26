@@ -17,6 +17,8 @@ import (
 var subRepo interfaces.SubRepository
 var subCache = cache.New[uint16, subModel.Data](16)
 
+var ErrSubNotFound = errors.New("sub not found")
+
 type subOrderValidationError struct {
 	msg string
 }
@@ -71,7 +73,7 @@ func GetSubByID(ctx context.Context, id uint16) (*subModel.Data, error) {
 	if s, ok := subCache.Get(id); ok {
 		return &s, nil
 	}
-	return nil, fmt.Errorf("sub not found")
+	return nil, ErrSubNotFound
 }
 func GetSubNameByID(ctx context.Context, id uint16) string {
 	sub, err := GetSubByID(ctx, id)
@@ -127,7 +129,7 @@ func UpdateSub(ctx context.Context, sub *subModel.Data) error {
 	}
 	oldSub, ok := subCache.Get(sub.ID)
 	if !ok {
-		return fmt.Errorf("sub not found")
+		return ErrSubNotFound
 	}
 	sub.Result = oldSub.Result
 	sub.SortOrder = oldSub.SortOrder
@@ -151,7 +153,7 @@ func UpdateSubResult(ctx context.Context, id uint16, result subModel.Result) err
 	}
 	sub, ok := subCache.Get(id)
 	if !ok {
-		return fmt.Errorf("sub not found")
+		return ErrSubNotFound
 	}
 	var oldStatus subModel.Result
 	json.Unmarshal([]byte(sub.Result), &oldStatus)
@@ -186,10 +188,14 @@ func DeleteSub(ctx context.Context, id uint16) error {
 			return err
 		}
 	}
-	if err := SubRepo().Delete(ctx, id); err != nil {
+	deleted, err := SubRepo().DeleteCascade(ctx, id)
+	if err != nil {
 		return err
 	}
 	subCache.Del(id)
+	if !deleted {
+		return ErrSubNotFound
+	}
 	return nil
 }
 
@@ -201,7 +207,7 @@ func UpdateSubInfo(ctx context.Context, id uint16, upload, download, total, expi
 	}
 	sub, ok := subCache.Get(id)
 	if !ok {
-		return fmt.Errorf("sub not found")
+		return ErrSubNotFound
 	}
 	if err := SubRepo().UpdateSubInfo(ctx, id, upload, download, total, expire, infoUpdatedAt); err != nil {
 		return err

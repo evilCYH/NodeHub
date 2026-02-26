@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"sync"
@@ -19,9 +20,47 @@ import (
 
 // 防重复提交锁（基于订阅名称）
 var (
-	creatingSubs   = make(map[string]time.Time)
-	creatingSubsMu sync.Mutex
+	creatingSubs     = make(map[string]time.Time)
+	creatingSubsMu   sync.Mutex
+	deleteSubLocks   = make(map[uint16]*deleteSubLock)
+	deleteSubLocksMu sync.Mutex
 )
+
+type deleteSubLock struct {
+	mu   sync.Mutex
+	refs int
+}
+
+func acquireDeleteSubLock(subID uint16) (*deleteSubLock, bool) {
+	deleteSubLocksMu.Lock()
+	lock, ok := deleteSubLocks[subID]
+	if !ok {
+		lock = &deleteSubLock{}
+		deleteSubLocks[subID] = lock
+	}
+	lock.refs++
+	deleteSubLocksMu.Unlock()
+
+	if !lock.mu.TryLock() {
+		releaseDeleteSubLockRef(subID, lock)
+		return nil, false
+	}
+	return lock, true
+}
+
+func releaseDeleteSubLockRef(subID uint16, lock *deleteSubLock) {
+	deleteSubLocksMu.Lock()
+	lock.refs--
+	if lock.refs == 0 {
+		delete(deleteSubLocks, subID)
+	}
+	deleteSubLocksMu.Unlock()
+}
+
+func unlockAndReleaseDeleteSubLock(subID uint16, lock *deleteSubLock) {
+	lock.mu.Unlock()
+	releaseDeleteSubLockRef(subID, lock)
+}
 
 // isDuplicateRequest 检查是否重复提交（5秒内相同名称视为重复）
 func isDuplicateRequest(name string) bool {
@@ -307,15 +346,44 @@ func deleteSub(c *gin.Context) {
 		resp.ErrorBadRequest(c)
 		return
 	}
-	if err := op.DeleteSub(c.Request.Context(), uint16(id)); err != nil {
+
+	subID := uint16(id)
+	lock, ok := acquireDeleteSubLock(subID)
+	if !ok {
+		resp.Error(c, http.StatusConflict, "subscription delete in progress")
+		return
+	}
+	defer unlockAndReleaseDeleteSubLock(subID, lock)
+
+	if _, err := op.GetSubByID(c.Request.Context(), subID); err != nil {
+		if errors.Is(err, op.ErrSubNotFound) {
+			resp.Error(c, http.StatusNotFound, err.Error())
+			return
+		}
 		resp.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if err := cron.FetchRemove(uint16(id)); err != nil {
+
+	if cron.FetchIsRunning(subID) {
+		resp.Error(c, http.StatusConflict, "subscription is running and cannot be deleted")
+		return
+	}
+
+	if err := cron.FetchRemove(subID); err != nil {
 		resp.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	node.DeleteBySubId(uint16(id))
+
+	if err := op.DeleteSub(c.Request.Context(), subID); err != nil {
+		if errors.Is(err, op.ErrSubNotFound) {
+			resp.Error(c, http.StatusNotFound, err.Error())
+			return
+		}
+		resp.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	node.DeleteBySubId(subID)
 	resp.Success(c, nil)
 }
 

@@ -2,6 +2,7 @@ package cron
 
 import (
 	"context"
+	"errors"
 	"math/rand"
 	"time"
 
@@ -47,7 +48,6 @@ func FetchAdd(data *subModel.Data) error {
 	return nil
 }
 
-
 func runFetch(subID uint16, config string) subModel.Result {
 	fetchCtx, cancel := context.WithTimeout(context.Background(), 35*time.Second)
 	fetchRunning.Store(subID, cancel)
@@ -55,6 +55,18 @@ func runFetch(subID uint16, config string) subModel.Result {
 		cancel()
 		fetchRunning.Delete(subID)
 	}()
+	if _, err := op.GetSubByID(context.Background(), subID); err != nil {
+		log.Warnf("fetch task %d skipped: %v", subID, err)
+		msg := "fetch task not found"
+		if !errors.Is(err, op.ErrSubNotFound) {
+			msg = "fetch task unavailable"
+		}
+		return subModel.Result{
+			Msg:     msg,
+			LastRun: time.Now(),
+		}
+	}
+
 	result := fetch.Do(fetchCtx, subID, config)
 
 	// 阶段2：异步等待初测完成，保持running状态
@@ -155,17 +167,17 @@ func FetchRemove(subID uint16) error {
 	if entryID, ok := fetchScheduled.Load(subID); ok {
 		scheduler.Remove(entryID)
 		fetchScheduled.Delete(subID)
-		fetchFunc.Delete(subID)
-		if cancel, ok := fetchRunning.Load(subID); ok {
-			cancel()
-			fetchRunning.Delete(subID)
-		}
-		// 停止初测
-		if testCancel, ok := testingRunning.Load(subID); ok {
-			testCancel()
-			testingRunning.Delete(subID)
-			fetch.DeleteTestingDone(subID)
-		}
+	}
+	fetchFunc.Delete(subID)
+	if cancel, ok := fetchRunning.Load(subID); ok {
+		cancel()
+		fetchRunning.Delete(subID)
+	}
+	// 停止初测
+	if testCancel, ok := testingRunning.Load(subID); ok {
+		testCancel()
+		testingRunning.Delete(subID)
+		fetch.DeleteTestingDone(subID)
 	}
 	return nil
 }
@@ -204,4 +216,14 @@ func FetchStatus(subID uint16, enable bool) string {
 		return PendingStatus
 	}
 	return DisabledStatus
+}
+
+func FetchIsRunning(subID uint16) bool {
+	if _, ok := fetchRunning.Load(subID); ok {
+		return true
+	}
+	if _, ok := testingRunning.Load(subID); ok {
+		return true
+	}
+	return false
 }

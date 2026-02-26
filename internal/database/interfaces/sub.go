@@ -21,6 +21,9 @@ type SubRepository interface {
 	// Delete 删除链接
 	Delete(ctx context.Context, id uint16) error
 
+	// DeleteCascade 级联删除订阅及其关联日志，返回是否删除到记录
+	DeleteCascade(ctx context.Context, id uint16) (bool, error)
+
 	// List 获取订阅链接列表
 	List(ctx context.Context) (*[]sub.Data, error)
 

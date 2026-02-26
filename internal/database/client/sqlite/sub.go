@@ -156,6 +156,53 @@ func (r *SubRepository) Delete(ctx context.Context, id uint16) error {
 	return nil
 }
 
+func (r *SubRepository) DeleteCascade(ctx context.Context, id uint16) (bool, error) {
+	log.Debugf("Delete sub cascade")
+	tx, err := r.db.db.BeginTx(ctx, nil)
+	if err != nil {
+		return false, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	var existed int
+	if err := tx.QueryRowContext(ctx, `SELECT 1 FROM sub WHERE id = ? LIMIT 1`, id).Scan(&existed); err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to check sub existence: %w", err)
+	}
+
+	if _, err := tx.ExecContext(ctx, `DELETE FROM sub_run_event WHERE sub_id = ?`, id); err != nil {
+		return false, fmt.Errorf("failed to delete sub run events: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM sub_run WHERE sub_id = ?`, id); err != nil {
+		return false, fmt.Errorf("failed to delete sub runs: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM node_log WHERE sub_id = ?`, id); err != nil {
+		return false, fmt.Errorf("failed to delete node logs: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM node_update_log WHERE sub_id = ?`, id); err != nil {
+		return false, fmt.Errorf("failed to delete node update logs: %w", err)
+	}
+
+	result, err := tx.ExecContext(ctx, `DELETE FROM sub WHERE id = ?`, id)
+	if err != nil {
+		return false, fmt.Errorf("failed to delete sub: %w", err)
+	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("failed to get affected rows: %w", err)
+	}
+	if affected == 0 {
+		return false, nil
+	}
+
+	if err := tx.Commit(); err != nil {
+		return false, fmt.Errorf("failed to commit delete sub transaction: %w", err)
+	}
+	return true, nil
+}
+
 func (r *SubRepository) List(ctx context.Context) (*[]sub.Data, error) {
 	log.Debugf("List sub")
 	query := `SELECT id, sort_order, enable, name, tags, cron_expr, config, result, upload, download, total, expire, info_updated_at, created_at, updated_at
