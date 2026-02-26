@@ -32,6 +32,27 @@ func InitNodePool(size int) {
 	pool = make([]nodeModel.Data, 0, size)
 	nodeExist = NewExist(size)
 	nodeProcess = NewExist(size)
+	defer RefreshInfo()
+
+	if op.HasRepo() {
+		records, err := op.ListNodeRegistry(context.Background())
+		if err != nil {
+			log.Errorf("load node registry from db failed: %v", err)
+		} else if len(records) > 0 {
+			restored := make([]nodeModel.Record, 0, len(records))
+			for _, item := range records {
+				restored = append(restored, fromDBRecord(item))
+			}
+			registry.Replace(restored)
+			poolSize := op.GetSettingInt(setting.NODE_POOL_SIZE)
+			if poolSize <= 0 {
+				poolSize = size
+			}
+			RebuildPoolFromRegistry(poolSize)
+			return
+		}
+	}
+
 	sessionFile := config.Base().Session.NodePath
 	if _, err := os.Stat(sessionFile); os.IsNotExist(err) {
 		return
@@ -269,8 +290,8 @@ func (s *addStats) Finalize() {
 	if len(s.validNodes) > 0 {
 		merged = mergeNodesToPool(s.validNodes)
 		RebuildPoolFromRegistry(op.GetSettingInt(setting.NODE_POOL_SIZE))
-		RefreshInfo()
 	}
+	RefreshInfo()
 	log.Infof("Receipt successful, %d new nodes added", merged)
 
 	candidate := atomic.LoadUint32(&s.candidate)
@@ -998,6 +1019,11 @@ func DeleteBySubId(subID uint16) {
 
 	pool = pool[:end+1]
 	registry.DeleteBySubID(subID)
+	if op.HasRepo() {
+		if err := op.DeleteNodeRegistryBySubID(context.Background(), subID); err != nil {
+			log.Warnf("delete node registry by sub_id=%d failed: %v", subID, err)
+		}
+	}
 }
 
 // saveNodeTestLogs 保存节点测试日志
