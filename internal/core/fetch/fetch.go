@@ -187,7 +187,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	lines = lines[1:]
 	rawCount := uint32(0)
 	addRunEvent("parse", "info", "start parse nodes")
-	for _, line := range lines {
+	for idx, line := range lines {
 		if len(line) == 0 {
 			continue
 		}
@@ -201,8 +201,21 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		}
 		line = trimmed
 		if err := yaml.Unmarshal(line, &unique); err != nil {
+			log.Debugf("node parse unmarshal failed line=%d err=%v raw=%s", idx+2, err, string(line))
 			continue
 		}
+		log.Debugf(
+			"node parse unmarshal line=%d raw=%s unique={server:%q servername:%q port:%q type:%q uuid:%q username:%q password:%q}",
+			idx+2,
+			string(line),
+			unique.Server,
+			unique.Servername,
+			unique.Port,
+			unique.Type,
+			unique.Uuid,
+			unique.Username,
+			unique.Password,
+		)
 		rawCount++
 		if subConfig.ProtocolFilterEnable {
 			if subConfig.ProtocolFilterMode {
