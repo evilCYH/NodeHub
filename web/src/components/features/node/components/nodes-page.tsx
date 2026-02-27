@@ -36,7 +36,7 @@ export function NodesPage() {
             </div>
 
             <div className="px-4 lg:px-6">
-                <div className="grid gap-4 lg:gap-6 lg:grid-cols-[0.7fr_1.6fr] min-w-0">
+                <div className="grid gap-4 lg:gap-6 lg:grid-cols-[0.6fr_1.7fr] min-w-0">
                     <div className="flex items-center gap-3">
                         <Input
                             placeholder="搜索订阅名称"
