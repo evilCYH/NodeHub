@@ -17,9 +17,9 @@ import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
 import { InlineLoading } from "@/src/components/ui/loading"
 import { Switch } from "@/src/components/ui/switch"
-import { RefreshCw, Edit, Trash2, FileText, GripVertical } from "lucide-react"
+import { RefreshCw, Edit, Trash2, FileText, GripVertical, Clock, Zap, Activity, Database, Calendar, ArrowUp, ArrowDown } from "lucide-react"
 import { toast } from "sonner"
-import { cn, formatExpireStatus, formatLastRunTime, formatTrafficSummary, hasSubscriptionInfo } from "@/src/utils"
+import { cn, formatExpireStatus, formatLastRunTime, formatTrafficSummary, hasSubscriptionInfo, formatRelativeTime } from "@/src/utils"
 import { StatusBadge } from "@/src/components/shared/status-badge"
 import { formatSpeed } from "../utils"
 import { useSubs, useDeleteSub, useRefreshSub, useUpdateSub, useUpdateSubOrder } from "@/src/lib/queries/sub-queries"
@@ -86,38 +86,37 @@ function SortableSubCard({
         <Card
             ref={setNodeRef}
             style={style}
-            className={cn("gap-0 py-0", isDragging && "ring-2 ring-primary")}
+            className={cn(
+                "group relative overflow-hidden transition-all duration-200 hover:shadow-md hover:border-primary/50 p-0",
+                isDragging ? "opacity-30" : "opacity-100",
+                isDragging && "ring-2 ring-primary shadow-lg"
+            )}
         >
             <CardContent className="flex p-0">
-                <button
+                {/* Drag Handle - Flush left and top/bottom */}
+                <div
                     ref={setActivatorNodeRef}
-                    type="button"
-                    aria-label="拖拽排序"
-                    className="flex w-10 items-center justify-center border-r bg-muted/30 text-muted-foreground transition hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing"
                     {...attributes}
                     {...listeners}
+                    className="flex w-6 items-center justify-center bg-muted/20 text-muted-foreground/30 transition-colors hover:bg-muted hover:text-foreground cursor-grab active:cursor-grabbing relative shrink-0"
+                    title="按住拖拽排序"
                 >
-                    <GripVertical className="h-4 w-4" />
-                </button>
+                    <GripVertical className="h-3.5 w-3.5" />
+                    {/* Shortened, subtle divider */}
+                    <div className="absolute right-0 top-4 bottom-4 w-[1px] bg-foreground/5" />
+                </div>
 
-                <div className="flex min-w-0 flex-1 flex-col gap-2 p-3">
-                    <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                            <div
-                                className="truncate text-sm font-medium cursor-pointer hover:text-blue-600"
-                                onClick={() => onShowDetail(sub)}
-                            >
-                                {sub.name}
-                            </div>
-                            <div className="text-xs text-muted-foreground">{sub.cron_expr || 'N/A'}</div>
+                <div className="flex min-w-0 flex-1 flex-col gap-2 pl-3 pr-4 py-5">
+                    {/* Header: Name (Line 1) */}
+                    <div className="flex items-center justify-between gap-2">
+                        <div
+                            className="truncate text-[15px] font-bold text-foreground cursor-pointer hover:text-primary transition-colors flex-1"
+                            onClick={() => onShowDetail(sub)}
+                            title={sub.name}
+                        >
+                            {sub.name}
                         </div>
-
-                        <div className="flex items-center gap-2">
-                            <Switch
-                                checked={sub.enable}
-                                onCheckedChange={(checked) => onToggleEnable(sub, checked)}
-                                disabled={isUpdating}
-                            />
+                        <div className="flex items-center gap-1 shrink-0">
                             <StatusBadge status={sub.status === 'running'
                                 ? 'running'
                                 : sub.status === 'pending'
@@ -125,69 +124,85 @@ function SortableSubCard({
                                     : (sub.result?.last_status === 'error'
                                         ? 'error'
                                         : (sub.enable ? sub.status : 'none'))} />
+                            <Switch
+                                checked={sub.enable}
+                                onCheckedChange={(checked) => onToggleEnable(sub, checked)}
+                                disabled={isUpdating}
+                                className="scale-75"
+                            />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-                        <div>最后运行: <span className="text-muted-foreground">{formatLastRunTime(sub.result?.last_run)}</span></div>
-                        <div>执行时长: <span className="text-muted-foreground">{sub.result?.duration || 0}ms</span></div>
-                        <div>平均延迟: <span className="text-muted-foreground">{sub.info?.delay || 0}ms</span></div>
-                        <div className="text-muted-foreground">↑{formatSpeed(sub.info?.speed_up || 0)} ↓{formatSpeed(sub.info?.speed_down || 0)}</div>
-                        {!hasInfo ? (
-                            <>
-                                <div>流量: <span className="text-muted-foreground">未知</span></div>
-                                <div>到期时间: <span className="text-muted-foreground">未知</span></div>
-                            </>
-                        ) : (
-                            <>
-                                <div>
-                                    流量:
-                                    <span className={`ml-1 ${trafficClass}`}>
-                                        {traffic.usedText} / {traffic.totalText}
-                                    </span>
-                                </div>
-                                <div>到期时间: <span className={expireClass}>{expire.label}</span></div>
-                            </>
-                        )}
+                    {/* Middle Section: Contains Line 2 (Last Run) and Line 3 (Delay) */}
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                            {/* Line 2: Last Run */}
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground truncate">
+                                <Activity className="h-3 w-3 text-blue-500/80 shrink-0" />
+                                <span className="truncate">上次运行: {formatRelativeTime(sub.result?.last_run) || '从未运行'}</span>
+                            </div>
+                            {/* Line 3: Average Delay */}
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground truncate">
+                                <Zap className="h-3 w-3 text-amber-500/80 shrink-0" />
+                                <span className="truncate">平均延迟: {sub.info?.delay || 0}ms</span>
+                            </div>
+                        </div>
+
+                        {/* Right: Buttons (Aligned with the two lines above) */}
+                        <div className="flex items-center gap-0 shrink-0 self-center">
+                            <Button
+                                size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                                onClick={() => onShowLogs(sub)} title="日志"
+                            >
+                                <FileText className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                                size="sm" variant="ghost" className={cn(
+                                    "h-7 w-7 p-0 text-muted-foreground hover:text-primary",
+                                    sub.status === 'running' && "text-primary"
+                                )}
+                                onClick={() => onRefresh(sub.id)} disabled={sub.status === 'running'} title="刷新"
+                            >
+                                <RefreshCw className={cn("h-3.5 w-3.5", sub.status === 'running' && "animate-spin")} />
+                            </Button>
+                            <Button
+                                size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                                onClick={() => onEdit(sub)} title="编辑"
+                            >
+                                <Edit className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                                size="sm" variant="ghost" className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => onDelete(sub.id, sub.name)} disabled={isDeleting} title="删除"
+                            >
+                                {isDeleting ? (
+                                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                ) : (
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2 justify-end">
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onShowLogs(sub)}
-                        >
-                            <FileText className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onRefresh(sub.id)}
-                            disabled={sub.status === 'running'}
-                            className={sub.status === 'running' ? 'opacity-50' : ''}
-                        >
-                            <RefreshCw className={`h-4 w-4 ${sub.status === 'running' ? 'animate-spin' : ''}`} />
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onEdit(sub)}
-                        >
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => onDelete(sub.id, sub.name)}
-                            disabled={isDeleting}
-                            className={isDeleting ? 'opacity-50' : ''}
-                        >
-                            {isDeleting ? (
-                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                            ) : (
-                                <Trash2 className="h-4 w-4" />
-                            )}
-                        </Button>
+                    {/* Bottom Section: Line 4 (Traffic) and Progress Bar */}
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground/80 px-0.5 tabular-nums">
+                            <span className={cn("font-medium", trafficClass)}>
+                                {traffic.usedText} / {traffic.totalText}
+                            </span>
+                            <span className={cn("font-medium text-right", expireClass)}>{expire.label}</span>
+                        </div>
+                        {hasInfo && traffic.usagePercent !== null && (
+                            <div className="h-1 w-full bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                                <div
+                                    className={cn(
+                                        "h-full bg-primary transition-all duration-500",
+                                        traffic.isOverLimit ? "bg-red-500" : (traffic.usagePercent > 80 ? "bg-amber-500" : "")
+                                    )}
+                                    style={{ width: `${Math.min(100, traffic.usagePercent)}%` }}
+                                />
+                            </div>
+                        )}
                     </div>
                 </div>
             </CardContent>
@@ -352,7 +367,7 @@ export function SubList({
             onDragEnd={handleDragEnd}
         >
             <SortableContext items={itemIds} strategy={rectSortingStrategy}>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {items.map((sub) => (
                         <SortableSubCard
                             key={sub.id}

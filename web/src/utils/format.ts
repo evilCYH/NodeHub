@@ -129,7 +129,14 @@ export function formatExpireStatus(expire: number): ExpireStatus {
 
     const nowMs = Date.now()
     const expireMs = safeExpire * 1000
-    const expireDateLabel = new Date(expireMs).toLocaleString('zh-CN')
+    const expireDateLabel = new Date(expireMs).toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+    })
     if (expireMs <= nowMs) {
         return { label: expireDateLabel, state: 'expired' }
     }
