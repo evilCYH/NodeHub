@@ -82,73 +82,49 @@ export function SubDetail({
 
                     <div>
                         <h3 className="font-semibold mb-2">节点表现</h3>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div className="space-y-2">
-                                <div className="text-muted-foreground"><span>原始节点:</span> <span className="font-medium">{subscription.result?.raw_count || 0}</span></div>
-                                <div className="text-muted-foreground"><span>入库节点:</span> <span className="font-medium text-green-600">{subscription.info?.count || 0}</span></div>
-                                <div className="text-muted-foreground"><span>入库率:</span> <span className="font-medium">
-                                    {(subscription.result?.raw_count ?? 0) > 0
-                                        ? `${Math.round(((subscription.info?.count ?? 0) / (subscription.result?.raw_count ?? 1)) * 100)}%`
-                                        : "-"}
-                                </span></div>
-                                <div className="text-muted-foreground"><span>指标口径:</span> <span className="font-medium">当前状态</span></div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                            <div className="text-muted-foreground"><span>平均延迟:</span> {subscription.info?.delay || 0} ms</div>
+                            <div className="text-muted-foreground"><span>风险等级:</span>
+                                <span className={`font-medium ml-1 ${getRiskColor(subscription.info?.risk || 0)}`}>
+                                    {subscription.info?.risk || 0}/10
+                                </span>
                             </div>
-                            <div className="space-y-2">
-                                <div className="text-muted-foreground"><span>平均上行:</span> {formatSpeed(subscription.info?.speed_up)} MB/s</div>
-                                <div className="text-muted-foreground"><span>平均下行:</span> {formatSpeed(subscription.info?.speed_down)} MB/s</div>
-                                <div className="text-muted-foreground"><span>平均延迟:</span> {subscription.info?.delay || 0} ms</div>
-                                <div className="text-muted-foreground"><span>风险等级:</span>
-                                    <span className={`font-medium ml-1 ${getRiskColor(subscription.info?.risk || 0)}`}>
-                                        {subscription.info?.risk || 0}/10
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="space-y-2"></div>
+                            <div className="text-muted-foreground"><span>平均上行:</span> {formatSpeed(subscription.info?.speed_up)} MB/s</div>
+                            <div className="text-muted-foreground"><span>平均下行:</span> {formatSpeed(subscription.info?.speed_down)} MB/s</div>
                         </div>
                     </div>
 
                     <div>
                         <h3 className="font-semibold mb-2">流量与到期</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-2">
-                                {!hasInfo ? (
-                                    <>
-                                        <div className="text-muted-foreground"><span>上传流量:</span> 未知</div>
-                                        <div className="text-muted-foreground"><span>下载流量:</span> 未知</div>
-                                        <div className="text-muted-foreground"><span>已用流量:</span> 未知</div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="text-muted-foreground"><span>上传流量:</span> {formatBytes(subscription.upload)}</div>
-                                        <div className="text-muted-foreground"><span>下载流量:</span> {formatBytes(subscription.download)}</div>
-                                        <div className="text-muted-foreground">
-                                            <span>已用流量:</span>
-                                            <span className={`ml-1 ${traffic.isOverLimit ? 'text-red-600' : 'text-green-600'}`}>
-                                                {traffic.usedText}
-                                            </span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="space-y-2">
-                                {!hasInfo ? (
-                                    <>
-                                        <div className="text-muted-foreground"><span>总流量:</span> 未知</div>
-                                        <div className="text-muted-foreground"><span>到期状态:</span> 未知</div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="text-muted-foreground"><span>总流量:</span> {traffic.totalText}</div>
-                                        <div className="text-muted-foreground">
-                                            <span>到期状态:</span>
-                                            <span className={`ml-1 ${expireClass}`}>{expire.label}</span>
-                                        </div>
-                                        {traffic.isOverLimit ? (
-                                            <div className="text-red-600">已超限</div>
-                                        ) : null}
-                                    </>
-                                )}
-                            </div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                            {hasInfo ? (
+                                <>
+                                    <div className="text-muted-foreground"><span>上传流量:</span> {formatBytes(subscription.upload)}</div>
+                                    <div className="text-muted-foreground"><span>下载流量:</span> {formatBytes(subscription.download)}</div>
+                                    <div className="text-muted-foreground">
+                                        <span>已用流量:</span>
+                                        <span className={`ml-1 ${traffic.isOverLimit ? 'text-red-600' : 'text-green-600'}`}>
+                                            {traffic.usedText}
+                                        </span>
+                                    </div>
+                                    <div className="text-muted-foreground"><span>总流量:</span> {traffic.totalText}</div>
+                                    <div className="text-muted-foreground col-span-2">
+                                        <span>到期时间:</span>
+                                        <span className={`ml-1 ${expireClass}`}>{expire.label}</span>
+                                    </div>
+                                    {traffic.isOverLimit ? (
+                                        <div className="text-red-600 col-span-2">已超限</div>
+                                    ) : null}
+                                </>
+                            ) : (
+                                <>
+                                    <div className="text-muted-foreground"><span>上传流量:</span> 未知</div>
+                                    <div className="text-muted-foreground"><span>下载流量:</span> 未知</div>
+                                    <div className="text-muted-foreground"><span>已用流量:</span> 未知</div>
+                                    <div className="text-muted-foreground"><span>总流量:</span> 未知</div>
+                                    <div className="text-muted-foreground col-span-2"><span>到期时间:</span> 未知</div>
+                                </>
+                            )}
                         </div>
                     </div>
 

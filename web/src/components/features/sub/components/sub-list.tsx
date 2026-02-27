@@ -136,7 +136,7 @@ function SortableSubCard({
                         {!hasInfo ? (
                             <>
                                 <div>流量: <span className="text-muted-foreground">未知</span></div>
-                                <div>到期: <span className="text-muted-foreground">未知</span></div>
+                                <div>到期时间: <span className="text-muted-foreground">未知</span></div>
                             </>
                         ) : (
                             <>
@@ -146,7 +146,7 @@ function SortableSubCard({
                                         {traffic.usedText} / {traffic.totalText}
                                     </span>
                                 </div>
-                                <div>到期: <span className={expireClass}>{expire.label}</span></div>
+                                <div>到期时间: <span className={expireClass}>{expire.label}</span></div>
                             </>
                         )}
                     </div>

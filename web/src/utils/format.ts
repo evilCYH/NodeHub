@@ -129,17 +129,18 @@ export function formatExpireStatus(expire: number): ExpireStatus {
 
     const nowMs = Date.now()
     const expireMs = safeExpire * 1000
+    const expireDateLabel = new Date(expireMs).toLocaleString('zh-CN')
     if (expireMs <= nowMs) {
-        return { label: '已过期', state: 'expired' }
+        return { label: expireDateLabel, state: 'expired' }
     }
 
     const warningThresholdMs = 7 * 24 * 60 * 60 * 1000
-    if (expireMs-nowMs <= warningThresholdMs) {
-        return { label: '即将到期', state: 'warning' }
+    if (expireMs - nowMs <= warningThresholdMs) {
+        return { label: expireDateLabel, state: 'warning' }
     }
 
     return {
-        label: new Date(expireMs).toLocaleString('zh-CN'),
+        label: expireDateLabel,
         state: 'normal',
     }
 }

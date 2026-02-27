@@ -118,7 +118,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		}
 		if runLog.Status == "" || runLog.Status == "running" {
 			runLog.Status = "error"
-			runLog.Message = "unexpected termination"
+			runLog.Message = "任务异常终止"
 		}
 
 		runLog.DurationMs = uint32(time.Since(startTime).Milliseconds())
@@ -131,36 +131,36 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 
 	var subConfig subModel.Config
 	if err := json.Unmarshal([]byte(config), &subConfig); err != nil {
-		addRunEvent("config", "error", fmt.Sprintf("invalid config: %v", err))
+		addRunEvent("Config", "error", fmt.Sprintf("配置解析失败: %v", err))
 		log.Warnf("fetch task %d failed: %v", subID, err)
 		runLog.Status = "error"
 		runLog.Message = err.Error()
 		return createFailureResult(err.Error(), startTime)
 	}
 
-	log.Debugf("fetch task %d started", subID)
+	log.Debugf("抓取任务 %d 开始", subID)
 
-	addRunEvent("fetch", "info", "start fetch subscription")
+	addRunEvent("Fetch", "info", "开始抓取订阅")
 	client := mihomo.Default(subConfig.Proxy)
 	if client == nil {
-		addRunEvent("fetch", "error", "proxy config error")
-		log.Warnf("fetch task %d failed: proxy config error", subID)
+		addRunEvent("Fetch", "error", "代理配置错误")
+		log.Warnf("抓取任务 %d 失败: 代理配置错误", subID)
 		runLog.Status = "error"
-		runLog.Message = "proxy config error"
-		return createFailureResult("proxy config error", startTime)
+		runLog.Message = "代理配置错误"
+		return createFailureResult("代理配置错误", startTime)
 	}
 	defer client.Release()
 
 	content, subInfo, err := fetchSubscriptionWithFallback(ctx, client, subConfig.Url, addRunEvent)
 	if err != nil {
-		addRunEvent("fetch", "error", fmt.Sprintf("fetch failed: %v", err))
-		log.Errorf("fetch task %d failed: %v", subID, err)
+		addRunEvent("Fetch", "error", fmt.Sprintf("抓取失败: %v", err))
+		log.Errorf("抓取任务 %d 失败: %v", subID, err)
 		runLog.Status = "error"
 		runLog.Message = err.Error()
-		return createFailureResult("fetch task failed", startTime)
+		return createFailureResult("抓取任务失败", startTime)
 	}
 
-	addRunEvent("convert", "info", "start subconv convert")
+	addRunEvent("Convert", "info", "开始订阅转换")
 	convertTimeoutSec := subConfig.Timeout
 	if convertTimeoutSec <= 0 {
 		convertTimeoutSec = 10
@@ -169,7 +169,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	contentStr, err := subconv.ConvertData(subconvCtx, string(content), "mihomo")
 	subconvCancel()
 	if err != nil {
-		addRunEvent("convert", "error", fmt.Sprintf("convert failed: %v", err))
+		addRunEvent("Convert", "error", fmt.Sprintf("订阅转换失败: %v", err))
 		log.Errorf("fetch task %d failed: %v", subID, err)
 		runLog.Status = "error"
 		runLog.Message = err.Error()
@@ -186,7 +186,7 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	lines := bytes.Split(content, []byte("\n"))
 	lines = lines[1:]
 	rawCount := uint32(0)
-	addRunEvent("parse", "info", "start parse nodes")
+	addRunEvent("Parse", "info", "开始解析节点")
 	for idx, line := range lines {
 		if len(line) == 0 {
 			continue
@@ -259,33 +259,30 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		testingDone[subID] = done
 		testingDoneMu.Unlock()
 	}
-	addRunEvent("node_add", "info", fmt.Sprintf("fetch_raw=%d parsed=%d", rawCount, count))
+	// addRunEvent("NodeAdd", "info", fmt.Sprintf("抓取原始节点数=%d 协议过滤后节点数=%d", rawCount, count))
 	if done != nil {
 		go func(done <-chan struct{}, subID uint16, runID uint64, fetchRaw uint32, parsed int) {
 			<-done
 			logs, err := op.ListNodeUpdateLogsByRunID(context.Background(), subID, runID)
 			if err != nil {
-				addRunEvent("node_add", "warn", fmt.Sprintf("load node stats failed: %v", err))
+				addRunEvent("NodeAdd", "warn", fmt.Sprintf("读取节点统计失败: %v", err))
 				return
 			}
 			if len(logs) == 0 {
-				addRunEvent("node_add", "warn", "node stats empty after testing")
+				addRunEvent("NodeAdd", "warn", "初测结束后节点统计为空")
 				return
 			}
 			stats := logs[0]
-			addRunEvent("node_add", "info", fmt.Sprintf(
-				"fetch_raw=%d parsed=%d raw=%d candidate=%d duplicate=%d invalid=%d test_failed=%d accepted=%d merged=%d dropped=%d duration_ms=%d",
+			addRunEvent("NodeAdd", "info", fmt.Sprintf(
+				"抓取原始节点数=%d 协议过滤后节点数=%d 候选节点测试数=%d 无效节点数=%d 初测失败数=%d 初测通过数=%d 并入池节点数=%d 被淘汰节点数=%d",
 				fetchRaw,
 				parsed,
-				stats.RawCount,
 				stats.Candidate,
-				stats.Duplicate,
 				stats.Invalid,
 				stats.TestFailed,
 				stats.Accepted,
 				stats.Merged,
 				stats.Dropped,
-				stats.DurationMs,
 			))
 		}(done, subID, runLog.ID, rawCount, count)
 	}
@@ -293,19 +290,19 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 	if subInfo != nil {
 		updateInfoCtx, updateInfoCancel := context.WithTimeout(context.Background(), 2*time.Second)
 		if err := updateSubInfo(updateInfoCtx, subID, subInfo); err != nil {
-			addRunEvent("sub_info", "warn", fmt.Sprintf("update sub info failed: %v", err))
+			addRunEvent("SubInfo", "warn", fmt.Sprintf("更新订阅流量信息失败: %v", err))
 			log.Warnf("failed to update sub info for sub %d: %v", subID, err)
 		} else {
-			addRunEvent("sub_info", "info", "subscription userinfo updated")
+			addRunEvent("SubInfo", "info", "订阅流量信息已更新")
 		}
 		updateInfoCancel()
 	}
 
-	log.Infof("fetch task %d completed, raw node count: %d, accepted: %d, duration: %dms",
+	log.Infof("抓取任务 %d 完成，原始节点数: %d，协议过滤后: %d，耗时: %dms",
 		subID, rawCount, count, time.Since(startTime).Milliseconds())
 
 	runLog.Status = "success"
-	runLog.Message = "sub updated successfully"
+	runLog.Message = "订阅更新成功"
 	runLog.RawCount = rawCount
 	runLog.Accepted = uint32(count)
 	return createSuccessResult(rawCount, startTime, count == 0)
@@ -326,10 +323,10 @@ func fetchSubscriptionWithFallback(
 			time.Sleep(time.Duration(roundIdx) * time.Second)
 		}
 		for _, userAgent := range userAgents {
-			addRunEvent("fetch", "info", fmt.Sprintf("try fetch with ua=%s round=%d", userAgent, roundIdx+1))
+			addRunEvent("Fetch", "info", fmt.Sprintf("使用 ua=%s 第%d轮尝试抓取", userAgent, roundIdx+1))
 			currentContent, currentInfo, err := fetchOnce(ctx, client, url, userAgent)
 			if err != nil {
-				addRunEvent("fetch", "warn", fmt.Sprintf("fetch failed ua=%s round=%d: %v", userAgent, roundIdx+1, err))
+				addRunEvent("Fetch", "warn", fmt.Sprintf("抓取失败 ua=%s 第%d轮: %v", userAgent, roundIdx+1, err))
 				lastErr = err
 				continue
 			}
@@ -349,7 +346,7 @@ func fetchSubscriptionWithFallback(
 	}
 
 	if lastErr == nil {
-		lastErr = fmt.Errorf("all attempts failed")
+		lastErr = fmt.Errorf("所有抓取尝试均失败")
 	}
 	return nil, nil, lastErr
 }

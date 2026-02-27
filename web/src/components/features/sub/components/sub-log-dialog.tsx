@@ -55,7 +55,7 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="!max-w-[90vw] !sm:max-w-[1400px] !w-[1400px] max-h-[85vh] flex flex-col">
+            <DialogContent className="!max-w-[90vw] !sm:max-w-[1400px] !w-[1400px] max-h-[85vh] flex flex-col overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                 </DialogHeader>
@@ -134,8 +134,8 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                         )}
 
                         {/* 运行记录表格（可展开行） */}
-                        <Card className="flex-1 overflow-hidden">
-                            <CardContent className="p-0">
+                        <Card className="flex-1 min-h-0 overflow-hidden">
+                            <CardContent className="p-0 flex h-full min-h-0 flex-col">
                                 {/* 表头 */}
                                 <div className="border-b bg-muted/50">
                                     <div className="grid grid-cols-[28px_120px_80px_80px_80px_90px_80px_1fr] gap-3 px-4 py-3 font-medium text-sm">
@@ -151,8 +151,8 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                                 </div>
 
                                 {/* 表体 */}
-                                <div className="overflow-y-auto max-h-[50vh]">
-                                    <div className="divide-y">
+                                <div className="flex-1 min-h-0 overflow-y-auto">
+                                    <div className="divide-y pb-2">
                                         {runs.map((run) => {
                                             const isExpanded = expandedRunId === run.id
                                             const runEvents = eventsByRunId.get(run.id) ?? []
@@ -234,12 +234,12 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                                                                                     {formatTime(event.run_time ?? event.created_at)}
                                                                                 </div>
                                                                                 <div className="flex items-center">
-                                                                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                                                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-sm">
                                                                                         {event.step}
                                                                                     </Badge>
                                                                                 </div>
                                                                                 <div className="flex items-center">
-                                                                                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${levelCfg?.color ?? ""}`}>
+                                                                                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 rounded-sm ${levelCfg?.color ?? ""}`}>
                                                                                         {levelCfg?.label ?? event.level}
                                                                                     </Badge>
                                                                                 </div>
