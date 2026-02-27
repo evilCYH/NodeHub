@@ -272,7 +272,6 @@ export function SubList({
 
     const [items, setItems] = useState<SubResponse[]>([])
     const [activeId, setActiveId] = useState<number | null>(null)
-    const isDragging = activeId !== null
 
     useEffect(() => {
         if (!activeId && !updateSubOrderMutation.isPending) {
@@ -337,7 +336,7 @@ export function SubList({
         }
     }, [refreshSubMutation])
 
-    const handleDragStart = (event: { active: { id: any } }) => {
+    const handleDragStart = (event: { active: { id: string | number } }) => {
         setActiveId(Number(event.active.id))
     }
 
