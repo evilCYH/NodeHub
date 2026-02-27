@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Input } from "@/src/components/ui/input"
 import { ToggleGroup, ToggleGroupItem } from "@/src/components/ui/toggle-group"
 import { SubscriptionColumn } from "./subscription-column"
@@ -18,6 +18,15 @@ export function NodesPage() {
         const keyword = query.trim().toLowerCase()
         return subs.filter((sub) => sub.name.toLowerCase().includes(keyword))
     }, [query, subs])
+    const hasQuery = query.trim().length > 0
+
+    useEffect(() => {
+        if (!selectedSub) return
+        const stillVisible = filteredSubs.some((sub) => sub.id === selectedSub.id)
+        if (!stillVisible) {
+            setSelectedSub(null)
+        }
+    }, [filteredSubs, selectedSub])
 
     const { data: nodes = [], isLoading: nodesLoading, error: nodesError } = useNodes(selectedSub?.id ?? null, {
         scope: 'registry',
@@ -82,6 +91,7 @@ export function NodesPage() {
                             error={subsError as Error | null}
                             selectedId={selectedSub?.id ?? null}
                             onSelect={setSelectedSub}
+                            emptyMessage={hasQuery ? "暂无匹配订阅" : "暂无订阅数据"}
                         />
                     </div>
                     <div className="min-w-0">

@@ -16,12 +16,13 @@ interface SubscriptionColumnProps {
     error: Error | null
     selectedId: number | null
     onSelect: (sub: SubResponse) => void
+    emptyMessage?: string
 }
 
-export function SubscriptionColumn({ subs, registrySummaryNodes, isLoading, error, selectedId, onSelect }: SubscriptionColumnProps) {
+export function SubscriptionColumn({ subs, registrySummaryNodes, isLoading, error, selectedId, onSelect, emptyMessage = "暂无订阅数据" }: SubscriptionColumnProps) {
     const [isLogOpen, setIsLogOpen] = useState(false)
     const [logSub, setLogSub] = useState<SubResponse | null>(null)
-    const orderedSubs = useMemo(() => subs.slice().sort((a, b) => a.id - b.id), [subs])
+    const orderedSubs = subs
     const selectedSub = useMemo(() => orderedSubs.find((sub) => sub.id === selectedId) ?? null, [orderedSubs, selectedId])
     const aliveRateBySubId = useMemo(() => {
         const stats = new Map<number, { alive: number; dead: number }>()
@@ -69,7 +70,7 @@ export function SubscriptionColumn({ subs, registrySummaryNodes, isLoading, erro
             <Card>
                 <CardContent>
                     <div className="text-center py-8 text-muted-foreground">
-                        暂无订阅数据
+                        {emptyMessage}
                     </div>
                 </CardContent>
             </Card>
