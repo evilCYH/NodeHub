@@ -6,21 +6,41 @@ import { FileText } from "lucide-react"
 import { cn, formatLastRunTime } from "@/src/utils"
 import { formatSpeed } from "@/src/components/features/sub/utils"
 import { NodeLogDialog } from "./node-log-dialog"
-import type { SubResponse } from "@/src/types"
+import { NODE_STATUS } from "../constants"
+import type { NodeResponse, SubResponse } from "@/src/types"
 
 interface SubscriptionColumnProps {
     subs: SubResponse[]
+    registrySummaryNodes: NodeResponse[]
     isLoading: boolean
     error: Error | null
     selectedId: number | null
     onSelect: (sub: SubResponse) => void
 }
 
-export function SubscriptionColumn({ subs, isLoading, error, selectedId, onSelect }: SubscriptionColumnProps) {
+export function SubscriptionColumn({ subs, registrySummaryNodes, isLoading, error, selectedId, onSelect }: SubscriptionColumnProps) {
     const [isLogOpen, setIsLogOpen] = useState(false)
     const [logSub, setLogSub] = useState<SubResponse | null>(null)
     const orderedSubs = useMemo(() => subs.slice().sort((a, b) => a.id - b.id), [subs])
     const selectedSub = useMemo(() => orderedSubs.find((sub) => sub.id === selectedId) ?? null, [orderedSubs, selectedId])
+    const aliveRateBySubId = useMemo(() => {
+        const stats = new Map<number, { alive: number; dead: number }>()
+        for (const node of registrySummaryNodes) {
+            const current = stats.get(node.sub_id) ?? { alive: 0, dead: 0 }
+            if ((node.alive_status & NODE_STATUS.ALIVE) !== 0) {
+                current.alive += 1
+            } else {
+                current.dead += 1
+            }
+            stats.set(node.sub_id, current)
+        }
+        const rateMap = new Map<number, string>()
+        for (const [subId, item] of stats.entries()) {
+            const total = item.alive + item.dead
+            rateMap.set(subId, total > 0 ? `${Math.round((item.alive / total) * 100)}%` : "N/A")
+        }
+        return rateMap
+    }, [registrySummaryNodes])
 
     if (isLoading) {
         return (
@@ -80,11 +100,7 @@ export function SubscriptionColumn({ subs, isLoading, error, selectedId, onSelec
                             </div>
                             <div className="flex flex-col items-end justify-between self-stretch text-xs text-muted-foreground whitespace-nowrap">
                                 <div>
-                                    存活率: {
-                                        sub.result?.raw_count
-                                            ? `${Math.round(((sub.info?.count || 0) / sub.result.raw_count) * 100)}%`
-                                            : 'N/A'
-                                    }
+                                    存活率: {aliveRateBySubId.get(sub.id) ?? "N/A"}
                                 </div>
                                 <Button
                                     size="sm"

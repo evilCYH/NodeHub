@@ -5,6 +5,7 @@ const nodeKeys = {
     all: ['nodes'] as const,
     lists: () => [...nodeKeys.all, 'list'] as const,
     listBySub: (subId: number | null) => [...nodeKeys.lists(), { subId }] as const,
+    registrySummary: () => [...nodeKeys.all, 'registry-summary'] as const,
     detail: (subId: number | null, uniqueKey: number | string | null, scope: 'registry' | 'pool') =>
         [...nodeKeys.all, 'detail', { subId, uniqueKey, scope }] as const,
 }
@@ -42,6 +43,15 @@ export function useNodeDetail(
         queryFn: () => api.getNodeDetail({ subId: subId!, uniqueKey: uniqueKey!, scope }),
         enabled: enabled && subId !== null && uniqueKey !== null,
         staleTime: 30 * 1000,
+        notifyOnChangeProps: ['data', 'error', 'isLoading'],
+    })
+}
+
+export function useRegistryNodesSummary() {
+    return useQuery({
+        queryKey: nodeKeys.registrySummary(),
+        queryFn: () => api.getNodes({ scope: 'registry', status: 'all' }),
+        refetchInterval: 60 * 1000,
         notifyOnChangeProps: ['data', 'error', 'isLoading'],
     })
 }

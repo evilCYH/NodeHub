@@ -4,7 +4,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/src/components/ui/toggle-group"
 import { SubscriptionColumn } from "./subscription-column"
 import { NodesPanel } from "./nodes-panel"
 import { useSubs } from "@/src/lib/queries/sub-queries"
-import { useNodes } from "@/src/lib/queries/node-queries"
+import { useNodes, useRegistryNodesSummary } from "@/src/lib/queries/node-queries"
 import type { SubResponse } from "@/src/types"
 
 export function NodesPage() {
@@ -24,6 +24,7 @@ export function NodesPage() {
         status,
         includeFailed: false,
     })
+    const { data: registrySummaryNodes = [] } = useRegistryNodesSummary()
 
     return (
         <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
@@ -76,6 +77,7 @@ export function NodesPage() {
                     <div className="min-w-0">
                         <SubscriptionColumn
                             subs={filteredSubs}
+                            registrySummaryNodes={registrySummaryNodes}
                             isLoading={subsLoading}
                             error={subsError as Error | null}
                             selectedId={selectedSub?.id ?? null}
