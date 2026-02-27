@@ -23,4 +23,5 @@ config.json
 docs/feature/*
 docs/bug/*
 docs/evaluate/*
+docs/archive/*
 docs/*.md
