@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog"
 import { formatTime, formatLastRunTime, getNextCronRunTime, formatDuration, formatBytes, formatExpireStatus, formatTrafficSummary, hasSubscriptionInfo } from "@/src/utils"
-import { useNodeUpdateLog } from "@/src/lib/queries/node-log-queries"
 import StatusBadge from "@/src/components/shared/status-badge"
 import type { SubResponse } from "@/src/types/sub"
 
@@ -15,9 +14,6 @@ export function SubDetail({
     isOpen,
     onOpenChange,
 }: SubscriptionDetailProps) {
-    const { data: nodeLogData } = useNodeUpdateLog(subscription?.id ?? null, 5)
-    const latestLog = nodeLogData?.latest
-
     if (!subscription) return null
 
     const formatSpeed = (speed: number) => ((speed || 0) / 1024 / 1024).toFixed(2)
@@ -90,8 +86,12 @@ export function SubDetail({
                             <div className="space-y-2">
                                 <div className="text-muted-foreground"><span>原始节点:</span> <span className="font-medium">{subscription.result?.raw_count || 0}</span></div>
                                 <div className="text-muted-foreground"><span>入库节点:</span> <span className="font-medium text-green-600">{subscription.info?.count || 0}</span></div>
-                                <div className="text-muted-foreground"><span>候选节点:</span> <span className="font-medium">{latestLog?.candidate ?? 0}</span></div>
-                                <div className="text-muted-foreground"><span>重复节点:</span> <span className="font-medium">{latestLog?.duplicate ?? 0}</span></div>
+                                <div className="text-muted-foreground"><span>入库率:</span> <span className="font-medium">
+                                    {(subscription.result?.raw_count ?? 0) > 0
+                                        ? `${Math.round(((subscription.info?.count ?? 0) / (subscription.result?.raw_count ?? 1)) * 100)}%`
+                                        : "-"}
+                                </span></div>
+                                <div className="text-muted-foreground"><span>指标口径:</span> <span className="font-medium">当前状态</span></div>
                             </div>
                             <div className="space-y-2">
                                 <div className="text-muted-foreground"><span>平均上行:</span> {formatSpeed(subscription.info?.speed_up)} MB/s</div>
@@ -103,12 +103,7 @@ export function SubDetail({
                                     </span>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <div className="text-muted-foreground"><span>无效节点:</span> <span className="font-medium">{latestLog?.invalid ?? 0}</span></div>
-                                <div className="text-muted-foreground"><span>初测失败:</span> <span className="font-medium">{latestLog?.test_failed ?? 0}</span></div>
-                                <div className="text-muted-foreground"><span>通过初测:</span> <span className="font-medium text-green-600">{latestLog?.accepted ?? 0}</span></div>
-                                <div className="text-muted-foreground"><span>被淘汰:</span> <span className="font-medium">{latestLog?.dropped ?? 0}</span></div>
-                            </div>
+                            <div className="space-y-2"></div>
                         </div>
                     </div>
 
@@ -157,21 +152,6 @@ export function SubDetail({
                         </div>
                     </div>
 
-                    <div>
-                        <h3 className="font-semibold mb-2">执行结果</h3>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-2">
-                                <div className="text-muted-foreground"><span>成功次数:</span> <span className="text-green-600 font-medium">{subscription.result?.success || 0}</span></div>
-                                <div className="text-muted-foreground"><span>失败次数:</span> <span className="text-red-600 font-medium">{subscription.result?.fail || 0}</span></div>
-                            </div>
-                            <div>
-                                <div className="text-muted-foreground"><span>运行消息:</span></div>
-                                <div className="text-muted-foreground mt-1 p-2 bg-gray-50 rounded text-xs max-h-20 overflow-y-auto">
-                                    {subscription.result?.msg || '无消息'}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </DialogContent>
         </Dialog >

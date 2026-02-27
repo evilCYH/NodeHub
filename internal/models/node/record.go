@@ -9,6 +9,6 @@ type Record struct {
 	LastCheckAt     time.Time  `json:"last_check_at,omitempty"`
 	LastCheckSource string     `json:"last_check_source,omitempty"`
 	LastFailReason  string     `json:"last_fail_reason,omitempty"`
-	SeenAt          time.Time  `json:"seen_at"`
+	FirstSeenAt     time.Time  `json:"first_seen_at"`
 	UpdatedAt       time.Time  `json:"updated_at"`
 }

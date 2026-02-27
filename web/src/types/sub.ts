@@ -1,3 +1,5 @@
+import type { NodeUpdateLog } from './node'
+
 export interface SubConfig {
     url: string
     proxy?: boolean
@@ -65,6 +67,11 @@ export interface SubRunLog {
     duration_ms: number
 }
 
+export interface SubRunWithStats extends SubRunLog {
+    stats?: NodeUpdateLog
+    stats_pending?: boolean
+}
+
 export interface SubRunEvent {
     id: number
     run_id: number
@@ -77,7 +84,7 @@ export interface SubRunEvent {
 }
 
 export interface SubRunLogResponse {
-    runs: SubRunLog[]
+    runs: SubRunWithStats[]
     events: SubRunEvent[]
 }
 

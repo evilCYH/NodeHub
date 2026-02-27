@@ -15,8 +15,8 @@ type NodeUpdateLogRepository struct {
 }
 
 func (r *NodeUpdateLogRepository) Create(ctx context.Context, logEntry *nodeModel.UpdateLog) error {
-	query := `INSERT INTO node_update_log (sub_id, created_at, duration_ms, raw_count, candidate, duplicate, invalid, test_failed, accepted, merged, dropped, details)
-	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+	query := `INSERT INTO node_update_log (sub_id, run_id, created_at, duration_ms, raw_count, candidate, duplicate, invalid, test_failed, accepted, merged, dropped, details)
+	          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	createdAt := logEntry.CreatedAt
 	if createdAt.IsZero() {
 		createdAt = time.Now()
@@ -24,6 +24,7 @@ func (r *NodeUpdateLogRepository) Create(ctx context.Context, logEntry *nodeMode
 	details := encodeDetails(logEntry.Details)
 	result, err := r.db.db.ExecContext(ctx, query,
 		logEntry.SubID,
+		logEntry.RunID,
 		createdAt,
 		logEntry.DurationMs,
 		logEntry.RawCount,
@@ -52,7 +53,7 @@ func (r *NodeUpdateLogRepository) List(ctx context.Context, subID uint16, limit 
 	if limit <= 0 {
 		limit = 5
 	}
-	query := `SELECT id, sub_id, created_at, duration_ms, raw_count, candidate, duplicate, invalid, test_failed, accepted, merged, dropped, details
+	query := `SELECT id, sub_id, run_id, created_at, duration_ms, raw_count, candidate, duplicate, invalid, test_failed, accepted, merged, dropped, details
 	          FROM node_update_log WHERE sub_id = ? ORDER BY created_at DESC LIMIT ?`
 	rows, err := r.db.db.QueryContext(ctx, query, subID, limit)
 	if err != nil {
@@ -67,6 +68,7 @@ func (r *NodeUpdateLogRepository) List(ctx context.Context, subID uint16, limit 
 		if err := rows.Scan(
 			&logEntry.ID,
 			&logEntry.SubID,
+			&logEntry.RunID,
 			&logEntry.CreatedAt,
 			&logEntry.DurationMs,
 			&logEntry.RawCount,
@@ -88,6 +90,48 @@ func (r *NodeUpdateLogRepository) List(ctx context.Context, subID uint16, limit 
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("failed to iterate node update logs: %w", err)
+	}
+	return logs, nil
+}
+
+func (r *NodeUpdateLogRepository) ListByRunID(ctx context.Context, subID uint16, runID uint64) ([]nodeModel.UpdateLog, error) {
+	query := `SELECT id, sub_id, run_id, created_at, duration_ms, raw_count, candidate, duplicate, invalid, test_failed, accepted, merged, dropped, details
+	          FROM node_update_log WHERE sub_id = ? AND run_id = ? ORDER BY created_at DESC`
+	rows, err := r.db.db.QueryContext(ctx, query, subID, runID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list node update logs by run id: %w", err)
+	}
+	defer rows.Close()
+
+	var logs []nodeModel.UpdateLog
+	for rows.Next() {
+		var logEntry nodeModel.UpdateLog
+		var details sql.NullString
+		if err := rows.Scan(
+			&logEntry.ID,
+			&logEntry.SubID,
+			&logEntry.RunID,
+			&logEntry.CreatedAt,
+			&logEntry.DurationMs,
+			&logEntry.RawCount,
+			&logEntry.Candidate,
+			&logEntry.Duplicate,
+			&logEntry.Invalid,
+			&logEntry.TestFailed,
+			&logEntry.Accepted,
+			&logEntry.Merged,
+			&logEntry.Dropped,
+			&details,
+		); err != nil {
+			return nil, fmt.Errorf("failed to scan node update log by run id: %w", err)
+		}
+		if details.Valid {
+			logEntry.Details = decodeDetails(details.String)
+		}
+		logs = append(logs, logEntry)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate node update logs by run id: %w", err)
 	}
 	return logs, nil
 }

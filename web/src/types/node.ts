@@ -22,7 +22,9 @@ export interface NodeDetailResponse extends NodeResponse {
 }
 
 export interface NodeUpdateLog {
+    id?: number
     sub_id: number
+    run_id: number
     created_at: string
     duration_ms: number
     raw_count: number

@@ -1,10 +1,13 @@
 package node
 
 import (
+	"context"
 	"sync"
 	"time"
 
+	"github.com/evilCYH/NodeHub/internal/database/op"
 	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"github.com/evilCYH/NodeHub/internal/utils/log"
 )
 
 type registryKey struct {
@@ -22,6 +25,32 @@ func newRegistryStore() *registryStore {
 }
 
 func (r *registryStore) Upsert(record nodeModel.Record) {
+	item := r.upsertNoPersist(record)
+	r.persist(item)
+}
+
+func (r *registryStore) Replace(records []nodeModel.Record) {
+	now := time.Now()
+	newItems := make(map[registryKey]nodeModel.Record, len(records))
+	for _, record := range records {
+		if record.InitStatus == "" {
+			record.InitStatus = nodeModel.InitUnknown
+		}
+		if record.FirstSeenAt.IsZero() {
+			record.FirstSeenAt = now
+		}
+		if record.UpdatedAt.IsZero() {
+			record.UpdatedAt = now
+		}
+		key := registryKey{subID: record.Base.SubId, uniqueKey: record.Base.UniqueKey}
+		newItems[key] = record
+	}
+	r.mu.Lock()
+	r.items = newItems
+	r.mu.Unlock()
+}
+
+func (r *registryStore) upsertNoPersist(record nodeModel.Record) nodeModel.Record {
 	now := time.Now()
 	r.mu.Lock()
 	key := registryKey{subID: record.Base.SubId, uniqueKey: record.Base.UniqueKey}
@@ -41,14 +70,29 @@ func (r *registryStore) Upsert(record nodeModel.Record) {
 		if record.LastFailReason == "" {
 			record.LastFailReason = existing.LastFailReason
 		}
-		record.SeenAt = existing.SeenAt
+		record.FirstSeenAt = existing.FirstSeenAt
 		record.UpdatedAt = now
 	} else {
-		record.SeenAt = now
+		if record.InitStatus == "" {
+			record.InitStatus = nodeModel.InitUnknown
+		}
+		record.FirstSeenAt = now
 		record.UpdatedAt = now
 	}
 	r.items[key] = record
+	persistCopy := copyRecord(record)
 	r.mu.Unlock()
+	return persistCopy
+}
+
+func (r *registryStore) persist(record nodeModel.Record) {
+	if !op.HasRepo() {
+		return
+	}
+	dbRecord := toDBRecord(record)
+	if err := op.UpsertNodeRegistry(context.Background(), &dbRecord); err != nil {
+		log.Warnf("failed to persist node registry sub_id=%d key=%d: %v", record.Base.SubId, record.Base.UniqueKey, err)
+	}
 }
 
 func (r *registryStore) Get(subID uint16, uniqueKey uint64) (nodeModel.Record, bool) {
@@ -59,6 +103,8 @@ func (r *registryStore) Get(subID uint16, uniqueKey uint64) (nodeModel.Record, b
 }
 
 func (r *registryStore) UpdateInfo(subID uint16, uniqueKey uint64, info *nodeModel.Info, source string) {
+	var persistRecord nodeModel.Record
+	var shouldPersist bool
 	r.mu.Lock()
 	key := registryKey{subID: subID, uniqueKey: uniqueKey}
 	item, ok := r.items[key]
@@ -68,11 +114,18 @@ func (r *registryStore) UpdateInfo(subID uint16, uniqueKey uint64, info *nodeMod
 		item.LastCheckSource = source
 		item.UpdatedAt = time.Now()
 		r.items[key] = item
+		persistRecord = copyRecord(item)
+		shouldPersist = true
 	}
 	r.mu.Unlock()
+	if shouldPersist {
+		r.persist(persistRecord)
+	}
 }
 
 func (r *registryStore) UpdateAlive(subID uint16, uniqueKey uint64, alive bool, delay uint16, source string) {
+	var persistRecord nodeModel.Record
+	var shouldPersist bool
 	r.mu.Lock()
 	key := registryKey{subID: subID, uniqueKey: uniqueKey}
 	item, ok := r.items[key]
@@ -88,11 +141,18 @@ func (r *registryStore) UpdateAlive(subID uint16, uniqueKey uint64, alive bool, 
 		item.LastCheckSource = source
 		item.UpdatedAt = time.Now()
 		r.items[key] = item
+		persistRecord = copyRecord(item)
+		shouldPersist = true
 	}
 	r.mu.Unlock()
+	if shouldPersist {
+		r.persist(persistRecord)
+	}
 }
 
 func (r *registryStore) UpdateCountry(subID uint16, uniqueKey uint64, country string, ok bool, source string) {
+	var persistRecord nodeModel.Record
+	var shouldPersist bool
 	r.mu.Lock()
 	key := registryKey{subID: subID, uniqueKey: uniqueKey}
 	item, exists := r.items[key]
@@ -103,11 +163,18 @@ func (r *registryStore) UpdateCountry(subID uint16, uniqueKey uint64, country st
 		item.LastCheckSource = source
 		item.UpdatedAt = time.Now()
 		r.items[key] = item
+		persistRecord = copyRecord(item)
+		shouldPersist = true
 	}
 	r.mu.Unlock()
+	if shouldPersist {
+		r.persist(persistRecord)
+	}
 }
 
 func (r *registryStore) UpdateRisk(subID uint16, uniqueKey uint64, risk uint8) {
+	var persistRecord nodeModel.Record
+	var shouldPersist bool
 	r.mu.Lock()
 	key := registryKey{subID: subID, uniqueKey: uniqueKey}
 	item, ok := r.items[key]
@@ -115,11 +182,18 @@ func (r *registryStore) UpdateRisk(subID uint16, uniqueKey uint64, risk uint8) {
 		item.Info.Risk = risk
 		item.UpdatedAt = time.Now()
 		r.items[key] = item
+		persistRecord = copyRecord(item)
+		shouldPersist = true
 	}
 	r.mu.Unlock()
+	if shouldPersist {
+		r.persist(persistRecord)
+	}
 }
 
 func (r *registryStore) UpdateSpeed(subID uint16, uniqueKey uint64, up uint32, down uint32, source string) {
+	var persistRecord nodeModel.Record
+	var shouldPersist bool
 	r.mu.Lock()
 	key := registryKey{subID: subID, uniqueKey: uniqueKey}
 	item, ok := r.items[key]
@@ -134,11 +208,18 @@ func (r *registryStore) UpdateSpeed(subID uint16, uniqueKey uint64, up uint32, d
 		item.LastCheckSource = source
 		item.UpdatedAt = time.Now()
 		r.items[key] = item
+		persistRecord = copyRecord(item)
+		shouldPersist = true
 	}
 	r.mu.Unlock()
+	if shouldPersist {
+		r.persist(persistRecord)
+	}
 }
 
 func (r *registryStore) UpdateInitStatus(subID uint16, uniqueKey uint64, status nodeModel.InitStatus, reason string) {
+	var persistRecord nodeModel.Record
+	var shouldPersist bool
 	r.mu.Lock()
 	key := registryKey{subID: subID, uniqueKey: uniqueKey}
 	item, ok := r.items[key]
@@ -155,8 +236,13 @@ func (r *registryStore) UpdateInitStatus(subID uint16, uniqueKey uint64, status 
 		}
 		item.UpdatedAt = time.Now()
 		r.items[key] = item
+		persistRecord = copyRecord(item)
+		shouldPersist = true
 	}
 	r.mu.Unlock()
+	if shouldPersist {
+		r.persist(persistRecord)
+	}
 }
 
 func (r *registryStore) GetAll() []nodeModel.Record {
@@ -192,4 +278,17 @@ func (r *registryStore) DeleteBySubID(subID uint16) {
 		}
 	}
 	r.mu.Unlock()
+}
+
+func copyRecord(record nodeModel.Record) nodeModel.Record {
+	copied := record
+	copied.Base.Raw = append([]byte(nil), record.Base.Raw...)
+	if record.Info != nil {
+		infoCopy := *record.Info
+		infoCopy.Delay = cloneQueue(infoCopy.Delay)
+		infoCopy.SpeedUp = cloneQueue(infoCopy.SpeedUp)
+		infoCopy.SpeedDown = cloneQueue(infoCopy.SpeedDown)
+		copied.Info = &infoCopy
+	}
+	return copied
 }

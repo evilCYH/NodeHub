@@ -45,6 +45,8 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
     }, [subRunData?.events])
 
     const latest = runs[0]
+    const latestStats = latest?.stats
+    const latestStatsPending = Boolean(latest?.stats_pending && !latestStats)
 
     // 关闭弹窗时重置展开状态
     useEffect(() => {
@@ -73,7 +75,7 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                         {latest && (
                             <Card>
                                 <CardContent className="py-4">
-                                    <div className="grid grid-cols-3 md:grid-cols-6 gap-4 text-sm">
+                                    <div className="grid grid-cols-3 md:grid-cols-9 gap-4 text-sm">
                                         <div className="space-y-1">
                                             <div className="text-muted-foreground text-xs">状态</div>
                                             <div className="font-medium">
@@ -91,15 +93,33 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                                             <div className="font-medium">{latest.raw_count}</div>
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-muted-foreground text-xs">入库节点</div>
+                                            <div className="text-muted-foreground text-xs">解析后节点</div>
                                             <div className="font-medium text-green-600">{latest.accepted}</div>
                                         </div>
                                         <div className="space-y-1">
-                                            <div className="text-muted-foreground text-xs">接受率</div>
+                                            <div className="text-muted-foreground text-xs">解析率</div>
                                             <div className="font-medium">
                                                 {latest.raw_count > 0
                                                     ? `${Math.round((latest.accepted / latest.raw_count) * 100)}%`
                                                     : "-"}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="text-muted-foreground text-xs">通过初测</div>
+                                            <div className="font-medium text-green-600">
+                                                {latestStats ? latestStats.accepted : latestStatsPending ? "统计生成中" : "-"}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="text-muted-foreground text-xs">并入池</div>
+                                            <div className="font-medium text-green-600">
+                                                {latestStats ? latestStats.merged : latestStatsPending ? "统计生成中" : "-"}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="text-muted-foreground text-xs">被淘汰</div>
+                                            <div className="font-medium">
+                                                {latestStats ? latestStats.dropped : latestStatsPending ? "统计生成中" : "-"}
                                             </div>
                                         </div>
                                         <div className="space-y-1">
@@ -118,13 +138,14 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                             <CardContent className="p-0">
                                 {/* 表头 */}
                                 <div className="border-b bg-muted/50">
-                                    <div className="grid grid-cols-[28px_120px_80px_80px_80px_80px_1fr] gap-3 px-4 py-3 font-medium text-sm">
+                                    <div className="grid grid-cols-[28px_120px_80px_80px_80px_90px_80px_1fr] gap-3 px-4 py-3 font-medium text-sm">
                                         <div></div>
                                         <div>时间</div>
                                         <div>状态</div>
                                         <div>耗时</div>
                                         <div>原始</div>
-                                        <div>入库</div>
+                                        <div>解析后</div>
+                                        <div>初测通过</div>
                                         <div>消息</div>
                                     </div>
                                 </div>
@@ -143,7 +164,7 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                                                 <div key={run.id}>
                                                     {/* 运行记录主行 */}
                                                     <div
-                                                        className={`grid grid-cols-[28px_120px_80px_80px_80px_80px_1fr] gap-3 px-4 py-3 text-sm hover:bg-muted/50 ${hasEvents ? "cursor-pointer" : ""} ${isExpanded ? "bg-muted/30" : ""}`}
+                                                        className={`grid grid-cols-[28px_120px_80px_80px_80px_90px_80px_1fr] gap-3 px-4 py-3 text-sm hover:bg-muted/50 ${hasEvents ? "cursor-pointer" : ""} ${isExpanded ? "bg-muted/30" : ""}`}
                                                         onClick={() => {
                                                             if (hasEvents) {
                                                                 setExpandedRunId(isExpanded ? null : run.id)
@@ -176,6 +197,13 @@ export function SubLogDialog({ subscription, isOpen, onOpenChange }: SubLogDialo
                                                         </div>
                                                         <div className="flex items-center font-mono text-xs text-green-600">
                                                             {run.accepted}
+                                                        </div>
+                                                        <div className="flex items-center font-mono text-xs text-green-600">
+                                                            {run.stats
+                                                                ? run.stats.accepted
+                                                                : run.stats_pending
+                                                                    ? "生成中"
+                                                                    : "-"}
                                                         </div>
                                                         <div className="text-muted-foreground text-xs flex items-center truncate">
                                                             {run.message || (hasEvents ? `${runEvents.length} 条事件` : "")}

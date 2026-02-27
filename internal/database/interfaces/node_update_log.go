@@ -11,5 +11,6 @@ import (
 type NodeUpdateLogRepository interface {
 	Create(ctx context.Context, log *nodeModel.UpdateLog) error
 	List(ctx context.Context, subID uint16, limit int) ([]nodeModel.UpdateLog, error)
+	ListByRunID(ctx context.Context, subID uint16, runID uint64) ([]nodeModel.UpdateLog, error)
 	CleanupBefore(ctx context.Context, before time.Time) error
 }

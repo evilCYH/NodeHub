@@ -16,6 +16,7 @@ type Repository interface {
 	SubRun() SubRunRepository
 	NodeLog() NodeLogRepository
 	NodeUpdateLog() NodeUpdateLogRepository
+	NodeRegistry() NodeRegistryRepository
 
 	Storage() StorageRepository
 

@@ -15,9 +15,9 @@ export function useSubRunLogs(subId: number | null, limit = 10, enabled = true, 
         staleTime: 0,
         gcTime: 0,
         refetchInterval: (query) => {
-            const data = query.state.data as { runs?: { status: string }[] } | undefined
-            const hasRunning = data?.runs?.some(r => r.status === 'running') ?? false
-            return hasRunning ? 3000 : false
+            const data = query.state.data as { runs?: { status: string; stats_pending?: boolean }[] } | undefined
+            const hasPending = data?.runs?.some(r => r.status === 'running' || r.stats_pending) ?? false
+            return hasPending ? 3000 : false
         },
     })
 }

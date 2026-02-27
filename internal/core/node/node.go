@@ -307,6 +307,7 @@ func (s *addStats) Finalize() {
 
 	updateLog := nodeModel.UpdateLog{
 		SubID:      s.subID,
+		RunID:      s.runID,
 		CreatedAt:  time.Now(),
 		DurationMs: uint32(time.Since(s.start).Milliseconds()),
 		RawCount:   s.rawCount,
@@ -576,8 +577,16 @@ func Add(subID uint16, nodes []nodeModel.Base, runID uint64) (<-chan struct{}, i
 	return done, len(nodesToProcess)
 }
 
-func GetUpdateLog(subID uint16, limit int) nodeModel.UpdateLogResponse {
-	logs, err := op.ListNodeUpdateLogs(context.Background(), subID, limit)
+func GetUpdateLog(subID uint16, limit int, runID uint64) nodeModel.UpdateLogResponse {
+	var (
+		logs []nodeModel.UpdateLog
+		err  error
+	)
+	if runID > 0 {
+		logs, err = op.ListNodeUpdateLogsByRunID(context.Background(), subID, runID)
+	} else {
+		logs, err = op.ListNodeUpdateLogs(context.Background(), subID, limit)
+	}
 	if err != nil {
 		log.Warnf("failed to list node update logs: %v", err)
 		return nodeModel.UpdateLogResponse{}

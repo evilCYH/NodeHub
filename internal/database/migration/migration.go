@@ -36,8 +36,9 @@ func Register(client string, date uint64, version, description string, contentFu
 
 func Get(client string) []*Info {
 	if migrations := clientMigrations[client]; migrations != nil {
-		clientMigrations = nil
-		return migrations
+		result := make([]*Info, len(migrations))
+		copy(result, migrations)
+		return result
 	}
 	return make([]*Info, 0)
 }

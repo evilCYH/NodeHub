@@ -252,8 +252,12 @@ export const api = {
     return response.data
   },
 
-  async getNodeUpdateLog(subId: number, limit = 5): Promise<NodeUpdateLogResponse> {
-    const response = await apiClient.get<ApiResponse<NodeUpdateLogResponse>>(`${API_PATH.node}/log?sub_id=${subId}&limit=${limit}`)
+  async getNodeUpdateLog(subId: number, limit = 5, runId?: number): Promise<NodeUpdateLogResponse> {
+    const query = new URLSearchParams({ sub_id: String(subId), limit: String(limit) })
+    if (runId && runId > 0) {
+      query.set('run_id', String(runId))
+    }
+    const response = await apiClient.get<ApiResponse<NodeUpdateLogResponse>>(`${API_PATH.node}/log?${query.toString()}`)
     return response.data
   },
 

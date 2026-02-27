@@ -39,10 +39,10 @@ var fetchRoundUserAgents = [][]string{
 }
 
 type SubInfo struct {
-	Upload   int64
-	Download int64
-	Total    int64
-	Expire   int64
+	Upload    int64
+	Download  int64
+	Total     int64
+	Expire    int64
 	hasUpload bool
 	hasDown   bool
 	hasTotal  bool
@@ -259,7 +259,36 @@ func Do(ctx context.Context, subID uint16, config string) subModel.Result {
 		testingDone[subID] = done
 		testingDoneMu.Unlock()
 	}
-	addRunEvent("node_add", "info", fmt.Sprintf("raw=%d accepted=%d", rawCount, count))
+	addRunEvent("node_add", "info", fmt.Sprintf("fetch_raw=%d parsed=%d", rawCount, count))
+	if done != nil {
+		go func(done <-chan struct{}, subID uint16, runID uint64, fetchRaw uint32, parsed int) {
+			<-done
+			logs, err := op.ListNodeUpdateLogsByRunID(context.Background(), subID, runID)
+			if err != nil {
+				addRunEvent("node_add", "warn", fmt.Sprintf("load node stats failed: %v", err))
+				return
+			}
+			if len(logs) == 0 {
+				addRunEvent("node_add", "warn", "node stats empty after testing")
+				return
+			}
+			stats := logs[0]
+			addRunEvent("node_add", "info", fmt.Sprintf(
+				"fetch_raw=%d parsed=%d raw=%d candidate=%d duplicate=%d invalid=%d test_failed=%d accepted=%d merged=%d dropped=%d duration_ms=%d",
+				fetchRaw,
+				parsed,
+				stats.RawCount,
+				stats.Candidate,
+				stats.Duplicate,
+				stats.Invalid,
+				stats.TestFailed,
+				stats.Accepted,
+				stats.Merged,
+				stats.Dropped,
+				stats.DurationMs,
+			))
+		}(done, subID, runLog.ID, rawCount, count)
+	}
 
 	if subInfo != nil {
 		updateInfoCtx, updateInfoCancel := context.WithTimeout(context.Background(), 2*time.Second)

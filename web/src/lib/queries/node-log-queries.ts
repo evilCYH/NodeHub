@@ -10,10 +10,10 @@ const nodeLogKeys = {
         [...nodeLogKeys.all, 'logs', { subId, source, level, keyword, checkId }] as const,
 }
 
-export function useNodeUpdateLog(subId: number | null, limit = 5, enabled = true) {
+export function useNodeUpdateLog(subId: number | null, limit = 5, enabled = true, runId?: number | null) {
     return useQuery({
-        queryKey: nodeLogKeys.detail(subId),
-        queryFn: () => api.getNodeUpdateLog(subId as number, limit),
+        queryKey: [...nodeLogKeys.detail(subId), { runId: runId ?? null, limit }],
+        queryFn: () => api.getNodeUpdateLog(subId as number, limit, runId ?? undefined),
         enabled: subId !== null && enabled,
         refetchInterval: 60 * 1000,
         notifyOnChangeProps: ['data', 'error', 'isLoading'],

@@ -56,6 +56,30 @@ func getSubRunLog(c *gin.Context) {
 		resp.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+	for i := range runs {
+		statsLogs, err := op.ListNodeUpdateLogsByRunID(c.Request.Context(), uint16(parsedID), runs[i].ID)
+		if err != nil {
+			resp.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if len(statsLogs) > 0 {
+			runs[i].Stats = &statsLogs[0]
+			continue
+		}
+		if runs[i].Status == "running" {
+			runs[i].StatsPending = true
+			continue
+		}
+		if runs[i].Status == "success" {
+			finishedAt := runs[i].CreatedAt.Add(time.Duration(runs[i].DurationMs) * time.Millisecond)
+			if time.Since(finishedAt) <= 2*time.Minute {
+				runs[i].StatsPending = true
+			}
+		}
+		if runs[i].Status == "pending" {
+			runs[i].StatsPending = true
+		}
+	}
 	includeEvents := c.DefaultQuery("include_events", "false")
 	var events []subModel.RunEvent
 	if len(runs) > 0 {

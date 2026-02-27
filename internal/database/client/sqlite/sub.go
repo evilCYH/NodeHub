@@ -31,6 +31,10 @@ func (db *DB) NodeUpdateLog() interfaces.NodeUpdateLogRepository {
 	return &NodeUpdateLogRepository{db: db}
 }
 
+func (db *DB) NodeRegistry() interfaces.NodeRegistryRepository {
+	return &NodeRegistryRepository{db: db}
+}
+
 func (r *SubRepository) Create(ctx context.Context, link *sub.Data) error {
 	log.Debugf("Create sub")
 	tx, err := r.db.db.BeginTx(ctx, nil)
@@ -183,6 +187,9 @@ func (r *SubRepository) DeleteCascade(ctx context.Context, id uint16) (bool, err
 	}
 	if _, err := tx.ExecContext(ctx, `DELETE FROM node_update_log WHERE sub_id = ?`, id); err != nil {
 		return false, fmt.Errorf("failed to delete node update logs: %w", err)
+	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM node_registry WHERE sub_id = ?`, id); err != nil {
+		return false, fmt.Errorf("failed to delete node registry: %w", err)
 	}
 
 	result, err := tx.ExecContext(ctx, `DELETE FROM sub WHERE id = ?`, id)

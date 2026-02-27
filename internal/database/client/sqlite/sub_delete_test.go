@@ -4,6 +4,7 @@ import (
 	"context"
 	"path/filepath"
 	"testing"
+	"time"
 
 	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
 	subModel "github.com/evilCYH/NodeHub/internal/models/sub"
@@ -71,6 +72,17 @@ func TestSubDeleteCascadeRemovesRelatedData(t *testing.T) {
 		t.Fatalf("failed to create node update log: %v", err)
 	}
 
+	if err := repository.NodeRegistry().Upsert(ctx, &nodeModel.RegistryRecordDB{
+		SubID:       subData.ID,
+		UniqueKey:   12345,
+		Raw:         []byte("name: node-a\ntype: ss\n"),
+		InitStatus:  nodeModel.InitPassed,
+		FirstSeenAt: time.Now(),
+		UpdatedAt:   time.Now(),
+	}); err != nil {
+		t.Fatalf("failed to create node registry: %v", err)
+	}
+
 	deleted, err := subRepo.DeleteCascade(ctx, subData.ID)
 	if err != nil {
 		t.Fatalf("DeleteCascade returned error: %v", err)
@@ -121,6 +133,16 @@ func TestSubDeleteCascadeRemovesRelatedData(t *testing.T) {
 	}
 	if len(updateLogs) != 0 {
 		t.Fatalf("expected no node update logs, got %d", len(updateLogs))
+	}
+
+	registryRows, err := repository.NodeRegistry().List(ctx)
+	if err != nil {
+		t.Fatalf("List node registry returned error: %v", err)
+	}
+	for _, row := range registryRows {
+		if row.SubID == subData.ID {
+			t.Fatalf("expected no node registry rows for sub %d", subData.ID)
+		}
 	}
 
 	deleted, err = subRepo.DeleteCascade(ctx, subData.ID)

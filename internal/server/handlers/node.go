@@ -360,6 +360,7 @@ func getNodeDetail(c *gin.Context) {
 // @Security BearerAuth
 // @Param sub_id query int true "订阅ID"
 // @Param limit query int false "返回条数"
+// @Param run_id query int false "运行ID（可选，传入后按 run_id 精确查询）"
 // @Success 200 {object} resp.ResponseStruct{data=node.UpdateLogResponse} "获取成功"
 // @Failure 400 {object} resp.ResponseStruct "请求参数错误"
 // @Failure 401 {object} resp.ResponseStruct "未授权"
@@ -376,6 +377,7 @@ func getNodeUpdateLog(c *gin.Context) {
 		return
 	}
 	limit := 5
+	var runID uint64
 	if limitStr := strings.TrimSpace(c.Query("limit")); limitStr != "" {
 		parsedLimit, err := strconv.Atoi(limitStr)
 		if err != nil {
@@ -386,5 +388,13 @@ func getNodeUpdateLog(c *gin.Context) {
 			limit = parsedLimit
 		}
 	}
-	resp.Success(c, node.GetUpdateLog(uint16(parsedID), limit))
+	if runIDStr := strings.TrimSpace(c.Query("run_id")); runIDStr != "" {
+		parsedRunID, err := strconv.ParseUint(runIDStr, 10, 64)
+		if err != nil {
+			resp.ErrorBadRequest(c)
+			return
+		}
+		runID = parsedRunID
+	}
+	resp.Success(c, node.GetUpdateLog(uint16(parsedID), limit, runID))
 }

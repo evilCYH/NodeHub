@@ -5,6 +5,7 @@ import "time"
 type UpdateLog struct {
 	ID         uint64    `json:"id"`
 	SubID      uint16    `json:"sub_id"`
+	RunID      uint64    `json:"run_id"`
 	CreatedAt  time.Time `json:"created_at"`
 	DurationMs uint32    `json:"duration_ms"`
 	RawCount   uint32    `json:"raw_count"`

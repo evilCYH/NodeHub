@@ -1,16 +1,21 @@
 package sub
 
-import "time"
+import (
+	nodeModel "github.com/evilCYH/NodeHub/internal/models/node"
+	"time"
+)
 
 type RunLog struct {
-	ID         uint64    `json:"id"`
-	SubID      uint16    `json:"sub_id"`
-	Status     string    `json:"status"`
-	Message    string    `json:"message,omitempty"`
-	RawCount   uint32    `json:"raw_count"`
-	Accepted   uint32    `json:"accepted"`
-	CreatedAt  time.Time `json:"created_at"`
-	DurationMs uint32    `json:"duration_ms"`
+	ID           uint64               `json:"id"`
+	SubID        uint16               `json:"sub_id"`
+	Status       string               `json:"status"`
+	Message      string               `json:"message,omitempty"`
+	RawCount     uint32               `json:"raw_count"`
+	Accepted     uint32               `json:"accepted"`
+	Stats        *nodeModel.UpdateLog `json:"stats,omitempty"`
+	StatsPending bool                 `json:"stats_pending,omitempty"`
+	CreatedAt    time.Time            `json:"created_at"`
+	DurationMs   uint32               `json:"duration_ms"`
 }
 
 type RunEvent struct {
