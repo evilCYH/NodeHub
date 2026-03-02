@@ -57,7 +57,7 @@ func DefaultSetting() []Setting {
 		},
 		{
 			Key:   TASK_MAX_THREAD,
-			Value: "200",
+			Value: "50",
 		},
 		{
 			Key:   TASK_MAX_TIMEOUT,

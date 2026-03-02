@@ -22,7 +22,7 @@ import (
 )
 
 type TikTok struct {
-	Thread  int `json:"thread" name:"线程数" value:"200"`
+	Thread  int `json:"thread" name:"线程数" value:"20"`
 	Timeout int `json:"timeout" name:"超时时间" value:"10" desc:"单个节点检测的超时时间(s)"`
 }
 
